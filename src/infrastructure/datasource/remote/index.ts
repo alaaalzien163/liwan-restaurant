@@ -1,0 +1,9 @@
+export type { IMenuRemoteDataSource } from "./menu-remote-datasource";
+export type { IOrderRemoteDataSource } from "./order-remote-datasource";
+export type { IReservationRemoteDataSource } from "./reservation-remote-datasource";
+export type { IInventoryRemoteDataSource } from "./inventory-remote-datasource";
+export type { IStaffRemoteDataSource } from "./staff-remote-datasource";
+export type { ITableRemoteDataSource } from "./table-remote-datasource";
+export type { IInvoiceRemoteDataSource } from "./invoice-remote-datasource";
+export type { IAuthRemoteDataSource } from "./auth-remote-datasource";
+export type { ICustomerRemoteDataSource } from "./customer-remote-datasource";
