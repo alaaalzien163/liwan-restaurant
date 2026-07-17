@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Pencil, Trash2, Eye } from "lucide-react";
@@ -58,9 +57,6 @@ export function CategoryCard({
                 <p className="text-text-tertiary text-xs">{category.nameAr}</p>
               </div>
             </div>
-            <Badge variant={category.isActive ? "success" : "danger"} size="sm">
-              {category.isActive ? t("common.active") : t("common.inactive")}
-            </Badge>
           </div>
 
           {category.description && (
@@ -69,10 +65,7 @@ export function CategoryCard({
             </p>
           )}
 
-          <div className="flex items-center justify-between">
-            <span className="text-text-tertiary text-xs">
-              {t("categories.form.order")}: {category.displayOrder}
-            </span>
+          <div className="flex items-center justify-end">
             <div className="flex items-center gap-1">
               <Button
                 variant="ghost"

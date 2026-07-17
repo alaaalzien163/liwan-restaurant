@@ -4,7 +4,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Star, Award, Heart } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import aboutImage from "@/assets/images/WhatsApp Image 2026-07-15 at 15.20.39.jpeg";
+import aboutImage from "@/assets/images/about.jpeg";
 
 const highlights = [
   {

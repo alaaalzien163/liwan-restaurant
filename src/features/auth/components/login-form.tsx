@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 import { Mail, Lock, LogIn } from "lucide-react";
-import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
 export function LoginForm() {
@@ -27,7 +26,6 @@ export function LoginForm() {
     defaultValues: {
       email: "",
       password: "",
-      rememberMe: false,
     },
   });
 
@@ -75,23 +73,6 @@ export function LoginForm() {
           error={errors.password?.message}
           {...register("password")}
         />
-
-        <div className="flex items-center justify-between">
-          <label className="text-text-secondary hover:text-text-primary flex cursor-pointer items-center gap-2 text-sm transition-colors">
-            <input
-              type="checkbox"
-              className="border-border bg-surface text-primary-500 focus:ring-primary-500/20 h-4 w-4 rounded"
-              {...register("rememberMe")}
-            />
-            {t("auth.login.rememberMe")}
-          </label>
-          <Link
-            href="#"
-            className="text-primary-500 hover:text-primary-600 text-sm font-medium transition-colors"
-          >
-            {t("auth.login.forgotPassword")}
-          </Link>
-        </div>
 
         {error && (
           <motion.p

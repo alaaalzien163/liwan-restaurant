@@ -77,14 +77,14 @@ export function Table<T extends Record<string, unknown>>({
   return (
     <div
       className={cn(
-        "border-border overflow-x-auto rounded-lg border",
+        "border-border max-h-[550px] overflow-auto rounded-lg border",
         className,
       )}
       data-testid={testId}
     >
-      <table className="w-full table-auto text-start">
+      <table className="w-full min-w-[700px] table-auto text-start">
         <thead>
-          <tr className="border-border bg-surface-tertiary border-b">
+          <tr className="border-border bg-surface-tertiary sticky top-0 z-10 border-b">
             {columns.map((col) => (
               <th
                 key={col.key}

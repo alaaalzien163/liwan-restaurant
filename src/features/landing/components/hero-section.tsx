@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { ArrowDown, UtensilsCrossed, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
-import heroBgImage from "@/assets/images/WhatsApp Image 2026-07-15 at 15.20.28.jpeg";
+import heroBgImage from "@/assets/images/hero-1.jpeg";
 
 export function HeroSection() {
   const { t } = useTranslation();

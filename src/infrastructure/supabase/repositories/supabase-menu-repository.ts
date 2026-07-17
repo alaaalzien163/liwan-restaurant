@@ -92,7 +92,7 @@ export class SupabaseMenuRepository implements IMenuRepository {
     }
 
     const page = filters?.page ?? 1;
-    const pageSize = filters?.pageSize ?? 10;
+    const pageSize = filters?.pageSize ?? 1000;
     const start = (page - 1) * pageSize;
     const end = start + pageSize - 1;
 

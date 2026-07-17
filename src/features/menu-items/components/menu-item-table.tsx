@@ -28,7 +28,7 @@ interface MenuItemTableProps {
 export function MenuItemTable({
   data,
   isLoading,
-  sortBy = "displayOrder",
+  sortBy,
   sortOrder = "asc",
   onSort = () => {},
   onView,
@@ -86,46 +86,42 @@ export function MenuItemTable({
 
   const columns: Column<Record<string, unknown>>[] = [
     {
-      key: "image",
-      header: t("menuItems.table.image"),
-      width: "64px",
-      render: (_item) => {
-        const item = _item as unknown as MenuItemRecord;
-        return (
-          <button
-            type="button"
-            onClick={() => onImagePreview(item)}
-            className="bg-surface-tertiary hover:ring-primary-500 flex h-10 w-10 cursor-pointer items-center justify-center overflow-hidden rounded-lg transition-all hover:ring-2"
-            aria-label={`${t("common.preview")} ${item.name}`}
-          >
-            {item.image ? (
-              <Image
-                src={item.image}
-                alt={item.name}
-                width={40}
-                height={40}
-                className="h-full w-full object-cover"
-                unoptimized
-              />
-            ) : (
-              <span className="text-text-tertiary text-xs font-bold">
-                {item.name.charAt(0).toUpperCase()}
-              </span>
-            )}
-          </button>
-        );
-      },
-    },
-    {
       key: "name",
       header: t("menuItems.table.name"),
       sortable: true,
       render: (_item) => {
         const item = _item as unknown as MenuItemRecord;
         return (
-          <div>
-            <p className="text-text-primary font-medium">{item.name}</p>
-            <p className="text-text-tertiary text-xs">{item.nameAr}</p>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => onImagePreview(item)}
+              className="bg-surface-tertiary hover:ring-primary-500 flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-lg transition-all hover:ring-2"
+              aria-label={`${t("common.preview")} ${item.name}`}
+            >
+              {item.image ? (
+                <Image
+                  src={item.image}
+                  alt={item.name}
+                  width={36}
+                  height={36}
+                  className="h-full w-full object-cover"
+                  unoptimized
+                />
+              ) : (
+                <span className="text-text-tertiary text-xs font-bold">
+                  {item.name.charAt(0).toUpperCase()}
+                </span>
+              )}
+            </button>
+            <div className="min-w-0">
+              <p className="text-text-primary truncate font-medium">
+                {item.name}
+              </p>
+              <p className="text-text-tertiary rtl:font-arabic truncate text-xs">
+                {item.nameAr}
+              </p>
+            </div>
           </div>
         );
       },
@@ -147,91 +143,12 @@ export function MenuItemTable({
       key: "price",
       header: t("menuItems.table.price"),
       sortable: true,
-      width: "100px",
+      width: "80px",
       render: (_item) => {
         const item = _item as unknown as MenuItemRecord;
         return (
-          <div className="flex items-center gap-1">
-            <span className="text-text-primary font-medium">
-              SAR {item.price.toFixed(2)}
-            </span>
-            {item.discountPrice && (
-              <>
-                <span className="text-text-tertiary ms-1 text-xs line-through">
-                  SAR {item.discountPrice.toFixed(2)}
-                </span>
-                <Badge variant="success" size="sm">
-                  {t("menuItems.table.sale")}
-                </Badge>
-              </>
-            )}
-          </div>
+          <span className="text-text-primary font-medium">{item.price}</span>
         );
-      },
-    },
-    {
-      key: "isAvailable",
-      header: t("menuItems.table.available"),
-      width: "72px",
-      align: "center",
-      render: (_item) => {
-        const item = _item as unknown as MenuItemRecord;
-        return (
-          <button
-            type="button"
-            onClick={() => onToggleAvailability(item)}
-            className="inline-flex"
-            aria-label={`${t("common.available")} ${item.name}`}
-          >
-            <Badge
-              variant={item.isAvailable ? "success" : "danger"}
-              size="sm"
-              className="cursor-pointer"
-            >
-              {item.isAvailable
-                ? t("menuItems.table.yes")
-                : t("menuItems.table.no")}
-            </Badge>
-          </button>
-        );
-      },
-    },
-    {
-      key: "isFeatured",
-      header: t("menuItems.table.featured"),
-      width: "64px",
-      align: "center",
-      render: (_item) => {
-        const item = _item as unknown as MenuItemRecord;
-        return (
-          <button
-            type="button"
-            onClick={() => onToggleFeatured(item)}
-            className="inline-flex"
-            aria-label={`${t("common.featured")} ${item.name}`}
-          >
-            <Badge
-              variant={item.isFeatured ? "warning" : "default"}
-              size="sm"
-              className="cursor-pointer"
-            >
-              {item.isFeatured
-                ? t("menuItems.table.yes")
-                : t("menuItems.table.no")}
-            </Badge>
-          </button>
-        );
-      },
-    },
-    {
-      key: "displayOrder",
-      header: t("menuItems.table.order"),
-      sortable: true,
-      width: "60px",
-      align: "center",
-      render: (_item) => {
-        const item = _item as unknown as MenuItemRecord;
-        return <span className="text-text-secondary">{item.displayOrder}</span>;
       },
     },
     {

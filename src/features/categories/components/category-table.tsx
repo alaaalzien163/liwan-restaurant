@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { Table, type Column } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, Pencil, Trash2 } from "lucide-react";
 import type { CategoryEntity } from "@/domain/entities/category";
@@ -32,67 +31,38 @@ export function CategoryTable({
   const { t } = useTranslation();
   const columns: Column<Record<string, unknown>>[] = [
     {
-      key: "image",
-      header: t("categories.table.image"),
-      width: "72px",
-      render: (_item) => {
-        const item = _item as unknown as CategoryEntity;
-        return (
-          <div className="bg-surface-tertiary flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg">
-            {item.image ? (
-              <Image
-                src={item.image}
-                alt={item.name}
-                width={40}
-                height={40}
-                className="h-full w-full object-cover"
-                unoptimized
-              />
-            ) : (
-              <span className="text-text-tertiary text-xs font-bold">
-                {item.name.charAt(0).toUpperCase()}
-              </span>
-            )}
-          </div>
-        );
-      },
-    },
-    {
       key: "name",
       header: t("categories.table.name"),
       sortable: true,
       render: (_item) => {
         const item = _item as unknown as CategoryEntity;
         return (
-          <div>
-            <p className="text-text-primary font-medium">{item.name}</p>
-            <p className="text-text-tertiary text-xs">{item.nameAr}</p>
+          <div className="flex items-center gap-3">
+            <div className="bg-surface-tertiary flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg">
+              {item.image ? (
+                <Image
+                  src={item.image}
+                  alt={item.name}
+                  width={36}
+                  height={36}
+                  className="h-full w-full object-cover"
+                  unoptimized
+                />
+              ) : (
+                <span className="text-text-tertiary text-xs font-bold">
+                  {item.name.charAt(0).toUpperCase()}
+                </span>
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="text-text-primary truncate font-medium">
+                {item.name}
+              </p>
+              <p className="text-text-tertiary rtl:font-arabic truncate text-xs">
+                {item.nameAr}
+              </p>
+            </div>
           </div>
-        );
-      },
-    },
-    {
-      key: "displayOrder",
-      header: t("categories.table.order"),
-      sortable: true,
-      width: "80px",
-      align: "center",
-      render: (_item) => {
-        const item = _item as unknown as CategoryEntity;
-        return <span className="text-text-secondary">{item.displayOrder}</span>;
-      },
-    },
-    {
-      key: "isActive",
-      header: t("categories.table.status"),
-      width: "100px",
-      align: "center",
-      render: (_item) => {
-        const item = _item as unknown as CategoryEntity;
-        return (
-          <Badge variant={item.isActive ? "success" : "danger"} size="sm">
-            {item.isActive ? t("common.active") : t("common.inactive")}
-          </Badge>
         );
       },
     },

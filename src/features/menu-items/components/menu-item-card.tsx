@@ -79,26 +79,8 @@ export function MenuItemCard({
               </div>
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <span className="text-text-primary font-semibold">
-                  SAR {item.price.toFixed(2)}
+                  {item.price}
                 </span>
-                {item.discountPrice && (
-                  <span className="text-text-tertiary text-xs line-through">
-                    SAR {item.discountPrice.toFixed(2)}
-                  </span>
-                )}
-                <Badge
-                  variant={item.isAvailable ? "success" : "danger"}
-                  size="sm"
-                >
-                  {item.isAvailable
-                    ? t("common.available")
-                    : t("common.unavailable")}
-                </Badge>
-                {item.isFeatured && (
-                  <Badge variant="warning" size="sm">
-                    {t("common.featured")}
-                  </Badge>
-                )}
               </div>
             </div>
           </div>
@@ -109,10 +91,7 @@ export function MenuItemCard({
             </p>
           )}
 
-          <div className="border-border flex items-center justify-between border-t pt-2">
-            <span className="text-text-tertiary text-xs">
-              {t("common.orderLabel", { value: item.displayOrder })}
-            </span>
+          <div className="border-border flex items-center justify-end border-t pt-2">
             <div className="flex items-center gap-0.5">
               <Button
                 variant="ghost"

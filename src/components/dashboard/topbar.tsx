@@ -3,9 +3,7 @@
 import { useUIStore } from "@core/stores/ui-store";
 import { usePathname } from "next/navigation";
 import { Breadcrumb } from "./breadcrumb";
-import { SearchBar } from "./search-bar";
 import { UserMenu } from "./user-menu";
-import { NotificationButton } from "./notification-button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { LanguageSwitch } from "@/components/ui/language-switch";
 import { Menu, UtensilsCrossed } from "lucide-react";
@@ -60,10 +58,6 @@ export function Topbar() {
         </div>
       </div>
 
-      <div className="hidden lg:block">
-        <SearchBar className="w-72" />
-      </div>
-
       <div className="flex items-center gap-1">
         <div className="hidden sm:block">
           <LanguageSwitch
@@ -72,7 +66,6 @@ export function Topbar() {
           />
         </div>
         <ThemeToggle />
-        <NotificationButton />
         <UserMenu />
       </div>
     </header>

@@ -73,9 +73,6 @@ export function UserMenu() {
           <p className="text-text-primary text-sm leading-tight font-medium">
             {user?.name ?? t("nav.profile")}
           </p>
-          <p className="text-text-tertiary text-xs capitalize">
-            {user?.role ?? ""}
-          </p>
         </div>
       </button>
 

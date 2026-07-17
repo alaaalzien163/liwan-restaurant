@@ -77,10 +77,6 @@ export function LoginPageContent() {
             </div>
 
             <LoginForm />
-
-            <p className="text-text-tertiary mt-8 text-center text-xs">
-              {t("auth.login.demoCredentials")}
-            </p>
           </div>
         </div>
       </div>
