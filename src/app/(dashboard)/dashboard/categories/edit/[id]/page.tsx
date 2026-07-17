@@ -8,6 +8,7 @@ import {
 } from "@/features/categories/components";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { Card, CardContent } from "@/components/ui/card";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { useRouter } from "next/navigation";
 import { useCallback, use, useEffect } from "react";
 import { toast } from "sonner";
@@ -66,21 +67,23 @@ export default function EditCategoryPage({
   if (!category) return null;
 
   return (
-    <div>
-      <SectionHeader
-        title={t("categories.editTitle", { name: category.name })}
-        description={t("categories.editDescription")}
-      />
-      <Card>
-        <CardContent className="p-6">
-          <CategoryForm
-            initialData={category}
-            onSubmit={handleSubmit}
-            onCancel={handleCancel}
-            isLoading={updateMutation.isPending}
-          />
-        </CardContent>
-      </Card>
-    </div>
+    <ErrorBoundary>
+      <div>
+        <SectionHeader
+          title={t("categories.editTitle", { name: category.name })}
+          description={t("categories.editDescription")}
+        />
+        <Card>
+          <CardContent className="p-6">
+            <CategoryForm
+              initialData={category}
+              onSubmit={handleSubmit}
+              onCancel={handleCancel}
+              isLoading={updateMutation.isPending}
+            />
+          </CardContent>
+        </Card>
+      </div>
+    </ErrorBoundary>
   );
 }

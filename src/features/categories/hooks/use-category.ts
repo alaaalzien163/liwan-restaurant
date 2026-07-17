@@ -13,5 +13,6 @@ export function useCategory(id: string) {
     queryKey: ["category", id],
     queryFn: () => repo().getCategoryById(id),
     enabled: !!id,
+    retry: 1,
   });
 }

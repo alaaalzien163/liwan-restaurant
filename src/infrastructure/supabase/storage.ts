@@ -4,8 +4,13 @@ export function resolveImageUrl(
   bucket: string,
   path: string | null | undefined,
 ): string {
-  if (!path || path.startsWith("blob:")) return "";
-  if (path.startsWith("http://") || path.startsWith("https://")) return path;
+  if (!path) return "";
+  if (
+    path.startsWith("blob:") ||
+    path.startsWith("http://") ||
+    path.startsWith("https://")
+  )
+    return path;
 
   try {
     const supabase = getSupabaseClient();

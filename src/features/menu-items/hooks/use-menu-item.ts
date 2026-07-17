@@ -13,24 +13,26 @@ export function useMenuItem(id: string) {
     queryKey: ["menu-item", id],
     queryFn: async () => {
       const entity = await repo().getMenuItemById(id);
+      if (!entity) throw new Error("Menu item not found");
       const record: MenuItemRecord = {
-        id: entity.id,
-        categoryId: entity.categoryId,
-        name: entity.name,
-        nameAr: entity.nameAr,
-        description: entity.description,
-        descriptionAr: entity.descriptionAr,
-        price: entity.price,
+        id: entity.id ?? "",
+        categoryId: entity.categoryId ?? "",
+        name: entity.name ?? "",
+        nameAr: entity.nameAr ?? "",
+        description: entity.description ?? "",
+        descriptionAr: entity.descriptionAr ?? "",
+        price: typeof entity.price === "number" ? entity.price : 0,
         discountPrice: undefined,
-        image: entity.imageUrl,
-        displayOrder: entity.sortOrder,
-        isAvailable: entity.isAvailable,
-        isFeatured: entity.isFeatured,
-        createdAt: entity.createdAt,
-        updatedAt: entity.updatedAt,
+        image: entity.imageUrl ?? "",
+        displayOrder: entity.sortOrder ?? 0,
+        isAvailable: entity.isAvailable ?? true,
+        isFeatured: entity.isFeatured ?? false,
+        createdAt: entity.createdAt ?? "",
+        updatedAt: entity.updatedAt ?? "",
       };
       return record;
     },
     enabled: !!id,
+    retry: 1,
   });
 }

@@ -151,12 +151,6 @@ export class SupabaseMenuRepository implements IMenuRepository {
   async createMenuItem(dto: CreateMenuItemDto): Promise<MenuItemEntity> {
     const supabase = getSupabaseClient();
     const image = dto.imageUrl || null;
-    console.log(
-      "[createMenuItem] dto.imageUrl:",
-      dto.imageUrl,
-      "resolved image:",
-      image,
-    );
     if (image && isBlobUrl(image)) {
       throw new Error("Cannot persist blob URL as image");
     }
@@ -189,12 +183,6 @@ export class SupabaseMenuRepository implements IMenuRepository {
 
     const newImage =
       dto.imageUrl !== undefined ? dto.imageUrl || null : undefined;
-    console.log(
-      "[updateMenuItem] dto.imageUrl:",
-      dto.imageUrl,
-      "resolved newImage:",
-      newImage,
-    );
     if (newImage && isBlobUrl(newImage)) {
       throw new Error("Cannot persist blob URL as image");
     }

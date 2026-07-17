@@ -68,7 +68,7 @@ export function ContactSection() {
               </div>
             </div>
             <a
-              href={`https://wa.me/963991660966`}
+              href={`https://wa.me/${WHATSAPP_REVIEW_NUMBER}`}
               target="_blank"
               rel="noopener noreferrer"
               className="border-primary-500 bg-primary-500 hover:bg-primary-600 mt-4 flex items-center justify-center gap-2 rounded-xl border px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors"

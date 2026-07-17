@@ -97,7 +97,7 @@ export function MenuSection() {
         {sortedCategories && sortedCategories.length > 0 && (
           <div
             ref={scrollRef}
-            className="scrollbar-hide mt-10 flex gap-3 overflow-x-auto px-1 pb-2 rtl:space-x-reverse"
+            className="scrollbar-hide mt-10 flex gap-4 overflow-x-auto px-1 pb-2 rtl:space-x-reverse"
           >
             {sortedCategories.map((cat) => (
               <button
@@ -106,25 +106,25 @@ export function MenuSection() {
                 type="button"
                 onClick={() => setActiveCategory(cat.id)}
                 className={cn(
-                  "relative flex shrink-0 items-center gap-3 rounded-xl border px-5 py-3.5 text-left transition-all",
+                  "relative flex shrink-0 items-center gap-4 rounded-xl border px-6 py-4 text-left transition-all",
                   activeId === cat.id
                     ? "border-primary-500 bg-primary-500/10 shadow-sm"
                     : "border-border bg-surface hover:border-primary-200 hover:bg-primary-50 dark:hover:border-primary-800 dark:hover:bg-primary-950/20",
                 )}
               >
                 {cat.image ? (
-                  <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg">
+                  <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg">
                     <Image
                       src={cat.image}
                       alt={cat.name}
                       fill
                       className="object-cover"
-                      sizes="48px"
+                      sizes="56px"
                       unoptimized
                     />
                   </div>
                 ) : (
-                  <div className="from-primary-100 to-primary-200 dark:from-primary-900/30 dark:to-primary-800/20 flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br text-lg">
+                  <div className="from-primary-100 to-primary-200 dark:from-primary-900/30 dark:to-primary-800/20 flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br text-lg">
                     {cat.name.charAt(0)}
                   </div>
                 )}

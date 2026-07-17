@@ -8,6 +8,7 @@ import {
 } from "@/features/menu-items/components";
 import { SectionHeader } from "@/components/dashboard/section-header";
 import { Card, CardContent } from "@/components/ui/card";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { useRouter } from "next/navigation";
 import { useCallback, use, useEffect } from "react";
 import { toast } from "sonner";
@@ -73,21 +74,23 @@ export default function EditMenuItemPage({
   if (!item) return null;
 
   return (
-    <div>
-      <SectionHeader
-        title={t("menuItems.editTitle", { name: item.name })}
-        description={t("menuItems.editDescription")}
-      />
-      <Card>
-        <CardContent className="p-6">
-          <MenuItemForm
-            initialData={item}
-            onSubmit={handleSubmit}
-            onCancel={handleCancel}
-            isLoading={updateMutation.isPending}
-          />
-        </CardContent>
-      </Card>
-    </div>
+    <ErrorBoundary>
+      <div>
+        <SectionHeader
+          title={t("menuItems.editTitle", { name: item.name })}
+          description={t("menuItems.editDescription")}
+        />
+        <Card>
+          <CardContent className="p-6">
+            <MenuItemForm
+              initialData={item}
+              onSubmit={handleSubmit}
+              onCancel={handleCancel}
+              isLoading={updateMutation.isPending}
+            />
+          </CardContent>
+        </Card>
+      </div>
+    </ErrorBoundary>
   );
 }
