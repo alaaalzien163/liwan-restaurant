@@ -130,7 +130,8 @@
       "phone": "Phone",
       "address": "Address",
       "openingHours": "Opening Hours",
-      "mapTitle": "Liwan Restaurant Location"
+      "mapTitle": "Liwan Restaurant Location",
+      "reviewsButton": "Complaints & Reviews"
     },
     "footer": {
       "description": "Where exquisite flavors meet timeless elegance. Experience a culinary journey crafted with passion and served with distinction.",

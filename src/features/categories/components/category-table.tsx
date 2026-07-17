@@ -55,12 +55,14 @@ export function CategoryTable({
               )}
             </div>
             <div className="min-w-0">
-              <p className="text-text-primary truncate font-medium">
-                {item.name}
+              <p className="text-text-primary rtl:font-arabic truncate font-medium">
+                {item.nameAr || item.name}
               </p>
-              <p className="text-text-tertiary rtl:font-arabic truncate text-xs">
-                {item.nameAr}
-              </p>
+              {item.nameAr && (
+                <p className="text-text-tertiary truncate text-xs">
+                  {item.name}
+                </p>
+              )}
             </div>
           </div>
         );

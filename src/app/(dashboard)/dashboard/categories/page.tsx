@@ -57,7 +57,7 @@ export default function CategoriesPage() {
     } catch {
       toast.error(t("categories.toast.deleteFailed"));
     }
-  }, [deleteTarget, deleteMutation]);
+  }, [deleteTarget, deleteMutation, t]);
 
   const handleAdd = useCallback(() => {
     router.push("/dashboard/categories/add");

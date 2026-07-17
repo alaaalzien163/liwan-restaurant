@@ -54,7 +54,7 @@ export default function EditMenuItemPage({
         toast.error(t("menuItems.toast.updateFailed"));
       }
     },
-    [updateMutation, id, router],
+    [updateMutation, id, router, t],
   );
 
   const handleCancel = useCallback(() => {

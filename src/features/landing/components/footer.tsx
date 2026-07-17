@@ -1,12 +1,32 @@
 "use client";
 
 import { LANDING_NAV_LINKS, CONTACT_INFO, SOCIAL_LINKS } from "../constants";
-import { Instagram, MessageCircle } from "lucide-react";
+import { Instagram, MessageCircle, Facebook } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { cn } from "@core/lib/utils";
 
 const socialIcons = [
-  { icon: Instagram, href: SOCIAL_LINKS.instagram, label: "Instagram" },
-  { icon: MessageCircle, href: SOCIAL_LINKS.whatsapp, label: "WhatsApp" },
+  {
+    icon: Instagram,
+    href: SOCIAL_LINKS.instagram,
+    label: "Instagram",
+    colorClass:
+      "text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300",
+  },
+  {
+    icon: MessageCircle,
+    href: SOCIAL_LINKS.whatsapp,
+    label: "WhatsApp",
+    colorClass:
+      "text-green-500 hover:text-green-600 dark:text-green-400 dark:hover:text-green-300",
+  },
+  {
+    icon: Facebook,
+    href: SOCIAL_LINKS.facebook,
+    label: "Facebook",
+    colorClass:
+      "text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300",
+  },
 ];
 
 export function Footer() {
@@ -62,7 +82,17 @@ export function Footer() {
               {t("landing.footer.contact")}
             </h4>
             <ul className="text-text-secondary mt-4 space-y-2 text-sm">
-              <li>{CONTACT_INFO.phoneDisplay}</li>
+              {CONTACT_INFO.phoneNumbers.map((p) => (
+                <li key={p.number}>
+                  <a
+                    href={`tel:${p.number}`}
+                    className="hover:text-primary-500 cursor-pointer transition-colors"
+                    aria-label={`Call ${p.number}`}
+                  >
+                    {p.display}
+                  </a>
+                </li>
+              ))}
               <li className="text-xs leading-relaxed">
                 {CONTACT_INFO.address}
               </li>
@@ -80,7 +110,10 @@ export function Footer() {
                   href={s.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="border-border text-text-secondary hover:border-primary-300 hover:text-primary-500 flex h-9 w-9 items-center justify-center rounded-lg border transition-colors"
+                  className={cn(
+                    "border-border flex h-9 w-9 items-center justify-center rounded-lg border transition-colors",
+                    s.colorClass,
+                  )}
                   aria-label={s.label}
                 >
                   <s.icon className="h-4 w-4" />

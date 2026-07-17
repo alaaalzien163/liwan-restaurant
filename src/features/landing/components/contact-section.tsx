@@ -1,14 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Phone, MapPin, Instagram, MessageCircle } from "lucide-react";
-import { CONTACT_INFO, SOCIAL_LINKS } from "../constants";
+import { Phone, MapPin, MessageCircle } from "lucide-react";
+import { CONTACT_INFO, WHATSAPP_REVIEW_NUMBER } from "../constants";
 import { useTranslation } from "react-i18next";
-
-const socialIcons = [
-  { icon: Instagram, href: SOCIAL_LINKS.instagram, label: "Instagram" },
-  { icon: MessageCircle, href: SOCIAL_LINKS.whatsapp, label: "WhatsApp" },
-];
 
 export function ContactSection() {
   const { t } = useTranslation();
@@ -27,9 +22,6 @@ export function ContactSection() {
           <h2 className="text-text-primary mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
             {t("landing.contact.heading")}
           </h2>
-          <p className="text-text-secondary mx-auto mt-3 max-w-xl">
-            {t("landing.contact.description")}
-          </p>
         </motion.div>
 
         <div className="mx-auto mt-12 max-w-2xl">
@@ -47,12 +39,18 @@ export function ContactSection() {
                 <h3 className="text-text-primary font-semibold">
                   {t("landing.contact.phone")}
                 </h3>
-                <a
-                  href={`tel:${CONTACT_INFO.phone}`}
-                  className="text-text-secondary hover:text-primary-500 mt-0.5 block text-sm"
-                >
-                  {CONTACT_INFO.phoneDisplay}
-                </a>
+                <div className="mt-0.5 space-y-0.5">
+                  {CONTACT_INFO.phoneNumbers.map((p) => (
+                    <a
+                      key={p.number}
+                      href={`tel:${p.number}`}
+                      className="text-text-secondary hover:text-primary-500 block cursor-pointer text-sm transition-colors"
+                      aria-label={`Call ${p.number}`}
+                    >
+                      {p.display}
+                    </a>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -69,21 +67,15 @@ export function ContactSection() {
                 </p>
               </div>
             </div>
-
-            <div className="flex gap-3">
-              {socialIcons.map((s) => (
-                <a
-                  key={s.label}
-                  href={s.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="border-border bg-surface text-text-secondary hover:border-primary-300 hover:text-primary-500 flex h-10 w-10 items-center justify-center rounded-xl border shadow-sm transition-colors"
-                  aria-label={s.label}
-                >
-                  <s.icon className="h-4 w-4" />
-                </a>
-              ))}
-            </div>
+            <a
+              href={`https://wa.me/${WHATSAPP_REVIEW_NUMBER}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="border-primary-500 bg-primary-500 hover:bg-primary-600 mt-4 flex items-center justify-center gap-2 rounded-xl border px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors"
+            >
+              <MessageCircle className="h-5 w-5" />
+              {t("landing.contact.reviewsButton")}
+            </a>
           </motion.div>
         </div>
       </div>

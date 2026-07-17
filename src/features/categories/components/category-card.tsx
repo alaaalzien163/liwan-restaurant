@@ -51,10 +51,12 @@ export function CategoryCard({
                 )}
               </div>
               <div>
-                <h3 className="text-text-primary font-semibold">
-                  {category.name}
+                <h3 className="text-text-primary rtl:font-arabic font-semibold">
+                  {category.nameAr || category.name}
                 </h3>
-                <p className="text-text-tertiary text-xs">{category.nameAr}</p>
+                {category.nameAr && (
+                  <p className="text-text-tertiary text-xs">{category.name}</p>
+                )}
               </div>
             </div>
           </div>

@@ -4,7 +4,6 @@ import {
   useMenuItems,
   useDeleteMenuItem,
   useDuplicateMenuItem,
-  useUpdateMenuItem,
 } from "@/features/menu-items/hooks";
 import {
   MenuItemTable,
@@ -33,7 +32,6 @@ export default function MenuItemsPage() {
   const { data: categoriesData } = useCategories({ page: 1, pageSize: 50 });
   const deleteMutation = useDeleteMenuItem();
   const duplicateMutation = useDuplicateMenuItem();
-  const updateMutation = useUpdateMenuItem();
 
   const [deleteTarget, setDeleteTarget] = useState<MenuItemRecord | null>(null);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -86,7 +84,7 @@ export default function MenuItemsPage() {
     } catch {
       toast.error(t("menuItems.toast.deleteFailed"));
     }
-  }, [deleteTarget, deleteMutation]);
+  }, [deleteTarget, deleteMutation, t]);
 
   const handleDuplicate = useCallback(
     async (item: MenuItemRecord) => {
@@ -97,51 +95,7 @@ export default function MenuItemsPage() {
         toast.error(t("menuItems.toast.duplicateFailed"));
       }
     },
-    [duplicateMutation],
-  );
-
-  const handleToggleAvailability = useCallback(
-    async (item: MenuItemRecord) => {
-      try {
-        await updateMutation.mutateAsync({
-          id: item.id,
-          data: { isAvailable: !item.isAvailable },
-        });
-        toast.success(
-          t(
-            !item.isAvailable
-              ? "menuItems.toast.availableOn"
-              : "menuItems.toast.availableOff",
-            { name: item.name },
-          ),
-        );
-      } catch {
-        toast.error(t("menuItems.toast.availableFailed"));
-      }
-    },
-    [updateMutation],
-  );
-
-  const handleToggleFeatured = useCallback(
-    async (item: MenuItemRecord) => {
-      try {
-        await updateMutation.mutateAsync({
-          id: item.id,
-          data: { isFeatured: !item.isFeatured },
-        });
-        toast.success(
-          t(
-            !item.isFeatured
-              ? "menuItems.toast.featuredOn"
-              : "menuItems.toast.featuredOff",
-            { name: item.name },
-          ),
-        );
-      } catch {
-        toast.error(t("menuItems.toast.featuredFailed"));
-      }
-    },
-    [updateMutation],
+    [duplicateMutation, t],
   );
 
   const handleImagePreview = useCallback((item: MenuItemRecord) => {
@@ -189,8 +143,6 @@ export default function MenuItemsPage() {
               onEdit={handleEdit}
               onDelete={handleDeleteRequest}
               onDuplicate={handleDuplicate}
-              onToggleAvailability={handleToggleAvailability}
-              onToggleFeatured={handleToggleFeatured}
               onImagePreview={handleImagePreview}
               getCategoryName={getCategoryName}
             />

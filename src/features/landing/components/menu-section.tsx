@@ -5,6 +5,8 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePublicCategories } from "../hooks/use-public-categories";
 import { usePublicMenuItems } from "../hooks/use-public-menu-items";
+import type { PublicMenuItem } from "../types";
+import { ItemDetailsModal } from "./item-details-modal";
 import { cn } from "@core/lib/utils";
 import { useTranslation } from "react-i18next";
 
@@ -43,11 +45,20 @@ export function MenuSection() {
     refetch,
   } = usePublicMenuItems();
 
+  const sortedCategories = categories?.slice().sort((a, b) => {
+    const aIsOffers = a.name === "Offers" || a.nameAr === "عروض";
+    const bIsOffers = b.name === "Offers" || b.nameAr === "عروض";
+    if (aIsOffers && !bIsOffers) return -1;
+    if (!aIsOffers && bIsOffers) return 1;
+    return 0;
+  });
+
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [selectedItem, setSelectedItem] = useState<PublicMenuItem | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const activeTabRef = useRef<HTMLButtonElement>(null);
 
-  const activeId = activeCategory ?? categories?.[0]?.id ?? null;
+  const activeId = activeCategory ?? sortedCategories?.[0]?.id ?? null;
   const filteredItems = items?.filter((i) => i.categoryId === activeId) ?? [];
 
   useEffect(() => {
@@ -83,47 +94,49 @@ export function MenuSection() {
           </p>
         </motion.div>
 
-        {categories && categories.length > 0 && (
+        {sortedCategories && sortedCategories.length > 0 && (
           <div
             ref={scrollRef}
             className="scrollbar-hide mt-10 flex gap-3 overflow-x-auto px-1 pb-2 rtl:space-x-reverse"
           >
-            {categories.map((cat) => (
+            {sortedCategories.map((cat) => (
               <button
                 key={cat.id}
                 ref={cat.id === activeId ? activeTabRef : undefined}
                 type="button"
                 onClick={() => setActiveCategory(cat.id)}
                 className={cn(
-                  "relative flex shrink-0 items-center gap-3 rounded-xl border px-4 py-3 text-left transition-all",
+                  "relative flex shrink-0 items-center gap-3 rounded-xl border px-5 py-3.5 text-left transition-all",
                   activeId === cat.id
                     ? "border-primary-500 bg-primary-500/10 shadow-sm"
                     : "border-border bg-surface hover:border-primary-200 hover:bg-primary-50 dark:hover:border-primary-800 dark:hover:bg-primary-950/20",
                 )}
               >
                 {cat.image ? (
-                  <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg">
+                  <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg">
                     <Image
                       src={cat.image}
                       alt={cat.name}
                       fill
                       className="object-cover"
-                      sizes="40px"
+                      sizes="48px"
                       unoptimized
                     />
                   </div>
                 ) : (
-                  <div className="from-primary-100 to-primary-200 dark:from-primary-900/30 dark:to-primary-800/20 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br text-lg">
+                  <div className="from-primary-100 to-primary-200 dark:from-primary-900/30 dark:to-primary-800/20 flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br text-lg">
                     {cat.name.charAt(0)}
                   </div>
                 )}
                 <div className="min-w-0">
-                  <div className="text-text-primary text-sm font-semibold">
-                    {cat.name}
+                  <div className="text-text-primary rtl:font-arabic font-semibold">
+                    {cat.nameAr || cat.name}
                   </div>
-                  <div className="text-text-tertiary rtl:font-arabic text-xs">
-                    {cat.nameAr}
-                  </div>
+                  {cat.nameAr && (
+                    <div className="text-text-tertiary truncate text-xs">
+                      {cat.name}
+                    </div>
+                  )}
                 </div>
               </button>
             ))}
@@ -182,7 +195,8 @@ export function MenuSection() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.04, duration: 0.3 }}
                   whileHover={{ y: -4 }}
-                  className="group border-border bg-surface overflow-hidden rounded-xl border shadow-sm transition-shadow hover:shadow-md"
+                  className="group border-border bg-surface cursor-pointer overflow-hidden rounded-xl border shadow-sm transition-shadow hover:shadow-md"
+                  onClick={() => setSelectedItem(item)}
                 >
                   <div className="from-primary-100 to-primary-200 dark:from-primary-950/30 dark:to-primary-900/20 relative aspect-[3/2] overflow-hidden bg-gradient-to-br">
                     {item.image ? (
@@ -205,12 +219,14 @@ export function MenuSection() {
                   <div className="p-3 sm:p-4">
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
-                        <h3 className="text-text-primary truncate font-semibold">
-                          {item.name}
+                        <h3 className="text-text-primary rtl:font-arabic truncate font-semibold">
+                          {item.nameAr || item.name}
                         </h3>
-                        <p className="text-text-tertiary rtl:font-arabic text-xs">
-                          {item.nameAr}
-                        </p>
+                        {item.nameAr && (
+                          <p className="text-text-tertiary truncate text-xs">
+                            {item.name}
+                          </p>
+                        )}
                       </div>
                       <span className="bg-primary-50 text-primary-600 dark:bg-primary-950/30 dark:text-primary-400 shrink-0 rounded-lg px-2 py-0.5 text-xs font-semibold sm:px-2.5 sm:text-sm">
                         {item.price}
@@ -228,6 +244,12 @@ export function MenuSection() {
           </AnimatePresence>
         )}
       </div>
+
+      <ItemDetailsModal
+        item={selectedItem}
+        isOpen={!!selectedItem}
+        onClose={() => setSelectedItem(null)}
+      />
     </section>
   );
 }

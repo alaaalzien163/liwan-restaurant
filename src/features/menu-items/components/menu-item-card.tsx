@@ -64,12 +64,14 @@ export function MenuItemCard({
             <div className="min-w-0 flex-1">
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <h3 className="text-text-primary truncate font-semibold">
-                    {item.name}
+                  <h3 className="text-text-primary rtl:font-arabic truncate font-semibold">
+                    {item.nameAr || item.name}
                   </h3>
-                  <p className="text-text-tertiary truncate text-xs">
-                    {item.nameAr}
-                  </p>
+                  {item.nameAr && (
+                    <p className="text-text-tertiary truncate text-xs">
+                      {item.name}
+                    </p>
+                  )}
                 </div>
                 <div className="flex shrink-0 items-center gap-1">
                   <Badge variant="info" size="sm">

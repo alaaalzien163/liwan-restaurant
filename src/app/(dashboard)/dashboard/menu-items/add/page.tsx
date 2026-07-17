@@ -34,7 +34,7 @@ export default function AddMenuItemPage() {
         toast.error(t("menuItems.toast.createFailed"));
       }
     },
-    [createMutation, router],
+    [createMutation, router, t],
   );
 
   const handleCancel = useCallback(() => {

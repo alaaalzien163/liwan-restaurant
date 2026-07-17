@@ -19,8 +19,6 @@ interface MenuItemTableProps {
   onEdit: (item: MenuItemRecord) => void;
   onDelete: (item: MenuItemRecord) => void;
   onDuplicate: (item: MenuItemRecord) => void;
-  onToggleAvailability: (item: MenuItemRecord) => void;
-  onToggleFeatured: (item: MenuItemRecord) => void;
   onImagePreview: (item: MenuItemRecord) => void;
   getCategoryName: (categoryId: string) => string;
 }
@@ -35,8 +33,6 @@ export function MenuItemTable({
   onEdit,
   onDelete,
   onDuplicate,
-  onToggleAvailability,
-  onToggleFeatured,
   onImagePreview,
   getCategoryName,
 }: MenuItemTableProps) {
@@ -115,12 +111,14 @@ export function MenuItemTable({
               )}
             </button>
             <div className="min-w-0">
-              <p className="text-text-primary truncate font-medium">
-                {item.name}
+              <p className="text-text-primary rtl:font-arabic truncate font-medium">
+                {item.nameAr || item.name}
               </p>
-              <p className="text-text-tertiary rtl:font-arabic truncate text-xs">
-                {item.nameAr}
-              </p>
+              {item.nameAr && (
+                <p className="text-text-tertiary truncate text-xs">
+                  {item.name}
+                </p>
+              )}
             </div>
           </div>
         );

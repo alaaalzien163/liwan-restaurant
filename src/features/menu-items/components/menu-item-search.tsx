@@ -55,7 +55,7 @@ export function MenuItemSearch() {
       }
     }
     return opts;
-  }, [categoriesData]);
+  }, [categoriesData, t]);
 
   const handleSortClick = useCallback(() => {
     setSortOrder(sortOrder === "asc" ? "desc" : "asc");

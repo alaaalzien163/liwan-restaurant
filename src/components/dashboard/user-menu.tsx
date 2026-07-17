@@ -6,7 +6,6 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Avatar } from "@/components/ui/avatar";
 import { LogOut } from "lucide-react";
-import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
 const dropdownVariants = {

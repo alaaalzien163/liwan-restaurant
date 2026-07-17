@@ -92,7 +92,10 @@ export function PublicNavbar() {
 
         <button
           type="button"
-          className="flex items-center gap-2 md:hidden"
+          className={cn(
+            "flex items-center gap-2 md:hidden",
+            isScrolled ? "text-text-primary" : "text-white",
+          )}
           onClick={() => setIsMobileOpen(!isMobileOpen)}
           aria-label={
             isMobileOpen
@@ -128,24 +131,16 @@ export function PublicNavbar() {
                 </a>
               ))}
               <div className="border-border mt-2 flex items-center gap-2 border-t pt-3">
+                <Link href="/login" onClick={() => setIsMobileOpen(false)}>
+                  <Button variant="secondary" className="!h-9 !w-9 !p-0">
+                    <LogIn className="h-4 w-4" />
+                  </Button>
+                </Link>
                 <LanguageSwitch
                   currentLocale={i18n.language}
                   onLocaleChange={(code) => i18n.changeLanguage(code)}
                 />
                 <ThemeToggle />
-                <Link
-                  href="/login"
-                  onClick={() => setIsMobileOpen(false)}
-                  className="flex-1"
-                >
-                  <Button
-                    variant="secondary"
-                    isFullWidth
-                    leftIcon={<LogIn className="h-4 w-4" />}
-                  >
-                    {t("nav.login")}
-                  </Button>
-                </Link>
               </div>
             </div>
           </motion.div>
