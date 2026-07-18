@@ -8,6 +8,7 @@ import {
 } from "../schemas/category-schema";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { uploadFile } from "@/infrastructure/supabase/upload";
@@ -46,6 +47,7 @@ export function CategoryForm({
           image: initialData.image,
           displayOrder: initialData.displayOrder,
           isActive: initialData.isActive,
+          mainSection: initialData.mainSection,
         }
       : {
           name: "",
@@ -54,6 +56,7 @@ export function CategoryForm({
           image: "",
           displayOrder: 1,
           isActive: true,
+          mainSection: "food",
         },
   });
 
@@ -122,6 +125,17 @@ export function CategoryForm({
         label={t("categories.form.description")}
         placeholder={t("categories.form.descriptionPlaceholder")}
         {...register("description")}
+      />
+
+      <Select
+        label={t("categories.form.mainSection")}
+        isRequired
+        error={errors.mainSection?.message}
+        options={[
+          { label: t("categories.form.mainSectionFood"), value: "food" },
+          { label: t("categories.form.mainSectionDrinks"), value: "drinks" },
+        ]}
+        {...register("mainSection")}
       />
 
       <div className="grid gap-6 sm:grid-cols-2">

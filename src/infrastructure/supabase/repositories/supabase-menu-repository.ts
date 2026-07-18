@@ -274,6 +274,7 @@ export class SupabaseMenuRepository implements IMenuRepository {
         name_en: dto.name,
         name_ar: dto.nameAr,
         image_path: null,
+        main_section: "food",
       } satisfies Omit<CategoryRow, "id" | "created_at">)
       .select()
       .single();

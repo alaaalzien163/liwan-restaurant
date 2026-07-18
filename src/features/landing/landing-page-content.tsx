@@ -9,7 +9,6 @@ const AboutSection = dynamic(() =>
     default: m.AboutSection,
   })),
 );
-// const CategoriesSection = dynamic(() => import("./components/categories-section").then((m) => ({ default: m.CategoriesSection })));
 const MenuSection = dynamic(() =>
   import("./components/menu-section").then((m) => ({ default: m.MenuSection })),
 );
@@ -42,7 +41,6 @@ export function LandingPageContent() {
       <PublicNavbar />
       <HeroSection />
       <AboutSection />
-      {/* <CategoriesSection /> */}
       <MenuSection />
       <ContactSection />
       <Footer />

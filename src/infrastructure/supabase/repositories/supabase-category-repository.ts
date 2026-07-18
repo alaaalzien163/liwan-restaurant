@@ -22,6 +22,7 @@ function toDomain(row: CategoryRow): CategoryEntity {
     image: resolveImageUrl(IMAGE_BUCKET, row.image_path),
     displayOrder: 0,
     isActive: true,
+    mainSection: row.main_section as "food" | "drinks",
     createdAt: row.created_at,
     updatedAt: row.created_at,
   };
@@ -37,6 +38,10 @@ export class SupabaseCategoryRepository implements ICategoryRepository {
     if (filters?.search) {
       const q = filters.search;
       query = query.or(`name_en.ilike.%${q}%,name_ar.ilike.%${q}%`);
+    }
+
+    if (filters?.mainSection) {
+      query = query.eq("main_section", filters.mainSection);
     }
 
     const page = filters?.page ?? 1;
@@ -81,12 +86,6 @@ export class SupabaseCategoryRepository implements ICategoryRepository {
   async createCategory(dto: CreateCategoryDto): Promise<CategoryEntity> {
     const supabase = getSupabaseClient();
     const image = dto.image || null;
-    console.log(
-      "[createCategory] dto.image:",
-      dto.image,
-      "resolved image:",
-      image,
-    );
     if (image && isBlobUrl(image)) {
       throw new Error("Cannot persist blob URL as image");
     }
@@ -96,6 +95,7 @@ export class SupabaseCategoryRepository implements ICategoryRepository {
         name_en: dto.name,
         name_ar: dto.nameAr,
         image_path: image,
+        main_section: dto.mainSection,
       } satisfies Omit<CategoryRow, "id" | "created_at">)
       .select()
       .single();
@@ -111,12 +111,6 @@ export class SupabaseCategoryRepository implements ICategoryRepository {
     const supabase = getSupabaseClient();
 
     const newImage = dto.image !== undefined ? dto.image || null : undefined;
-    console.log(
-      "[updateCategory] dto.image:",
-      dto.image,
-      "resolved newImage:",
-      newImage,
-    );
     if (newImage && isBlobUrl(newImage)) {
       throw new Error("Cannot persist blob URL as image");
     }
@@ -140,6 +134,7 @@ export class SupabaseCategoryRepository implements ICategoryRepository {
     if (dto.name !== undefined) updates.name_en = dto.name;
     if (dto.nameAr !== undefined) updates.name_ar = dto.nameAr;
     if (dto.image !== undefined) updates.image_path = newImage;
+    if (dto.mainSection !== undefined) updates.main_section = dto.mainSection;
 
     const { data, error } = await supabase
       .from("categories")

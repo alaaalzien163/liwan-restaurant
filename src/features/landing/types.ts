@@ -6,6 +6,7 @@ export interface LandingCategory {
   descriptionAr: string;
   image: string;
   icon: string;
+  mainSection: "food" | "drinks";
 }
 
 export interface PublicMenuItem {

@@ -69,6 +69,28 @@ export function CategoryTable({
       },
     },
     {
+      key: "mainSection",
+      header: t("categories.table.mainSection"),
+      width: "120px",
+      render: (_item) => {
+        const item = _item as unknown as CategoryEntity;
+        const isFood = item.mainSection === "food";
+        return (
+          <span
+            className={
+              isFood
+                ? "inline-flex items-center rounded-full bg-orange-100 px-2.5 py-0.5 text-xs font-medium text-orange-700 dark:bg-orange-900/30 dark:text-orange-400"
+                : "inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+            }
+          >
+            {isFood
+              ? t("categories.table.mainSectionFood")
+              : t("categories.table.mainSectionDrinks")}
+          </span>
+        );
+      },
+    },
+    {
       key: "createdAt",
       header: t("categories.table.created"),
       sortable: true,

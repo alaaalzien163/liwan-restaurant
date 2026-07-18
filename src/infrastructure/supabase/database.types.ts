@@ -3,6 +3,7 @@ export interface CategoryRow {
   name_en: string;
   name_ar: string;
   image_path: string | null;
+  main_section: string;
   created_at: string;
 }
 

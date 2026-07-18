@@ -1,43 +1,51 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
-import logo from "@/assets/images/Liwan-removebg-preview.png";
+import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import logoImage from "@/assets/images/Liwan-removebg-preview.png";
+import Image from "next/image";
 
-export function SplashScreen({ onFinish }: { onFinish: () => void }) {
+interface SplashScreenProps {
+  onFinish: () => void;
+}
+
+export function SplashScreen({ onFinish }: SplashScreenProps) {
   const [show, setShow] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setShow(false);
-      setTimeout(onFinish, 500);
+      setTimeout(onFinish, 300);
     }, 2000);
     return () => clearTimeout(timer);
   }, [onFinish]);
 
   return (
-    <AnimatePresence>
-      {show && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 2.0 }}
-          className="bg-surface fixed inset-0 z-[100] flex flex-col items-center justify-center"
+    <motion.div
+      className="bg-surface fixed inset-0 z-50 flex items-center justify-center"
+      animate={show ? { opacity: 1 } : { opacity: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <div className="flex flex-col items-center gap-4">
+        <div className="relative h-24 w-24">
+          <Image
+            src={logoImage}
+            alt="Liwan"
+            fill
+            className="object-contain"
+            priority
+            unoptimized
+          />
+        </div>
+        <motion.h1
+          className="text-text-primary text-3xl font-bold tracking-wider"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 2.0, duration: 2.0 }}
         >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.85 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="flex flex-col items-center gap-4"
-          >
-            <Image src={logo} alt="Liwan" width={120} height={120} priority />
-            <h1 className="text-primary-500 text-3xl font-bold">Liwan</h1>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          Liwan
+        </motion.h1>
+      </div>
+    </motion.div>
   );
 }

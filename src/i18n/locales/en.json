@@ -110,6 +110,9 @@
       "sectionLabel": "Our Menu",
       "heading": "Discover Our Dishes",
       "description": "Carefully crafted dishes that celebrate flavor and presentation",
+      "offersHeading": "Offers",
+      "foodHeading": "Food",
+      "drinksHeading": "Drinks",
       "errorTitle": "Failed to load menu",
       "errorDescription": "Please check your connection and try again",
       "retry": "Retry",
@@ -186,6 +189,9 @@
       "imageHelper": "PNG, JPG, WEBP (max 5MB)",
       "imageError": "Only PNG, JPG, and WEBP files are allowed",
       "imageSizeError": "File size must be less than 5MB",
+      "mainSection": "Main Section",
+      "mainSectionFood": "Food",
+      "mainSectionDrinks": "Drinks",
       "save": "Save Category",
       "update": "Update Category"
     },
@@ -194,6 +200,9 @@
       "name": "Name",
       "order": "Order",
       "status": "Status",
+      "mainSection": "Main Section",
+      "mainSectionFood": "Food",
+      "mainSectionDrinks": "Drinks",
       "created": "Created",
       "actions": "Actions"
     },
@@ -203,6 +212,11 @@
       "emptyDescription": "Get started by creating your first category.",
       "errorTitle": "Failed to load categories",
       "errorFallback": "An unexpected error occurred. Please try again."
+    },
+    "filter": {
+      "all": "All",
+      "food": "Food",
+      "drinks": "Drinks"
     },
     "search": {
       "placeholder": "Search by name or Arabic name...",

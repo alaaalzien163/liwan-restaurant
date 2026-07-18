@@ -110,6 +110,9 @@
       "sectionLabel": "قائمة الطعام",
       "heading": "اكتشف أطباقنا",
       "description": "أطباق مُعدة بعناية تحتفي بالنكهة والعرض",
+      "offersHeading": "العروض",
+      "foodHeading": "الطعام",
+      "drinksHeading": "المشروبات",
       "errorTitle": "فشل تحميل القائمة",
       "errorDescription": "يرجى التحقق من اتصالك والمحاولة مرة أخرى",
       "retry": "إعادة المحاولة",
@@ -186,6 +189,9 @@
       "imageHelper": "PNG, JPG, WEBP (بحد أقصى 5 ميجابايت)",
       "imageError": "يُسمح فقط بملفات PNG و JPG و WEBP",
       "imageSizeError": "حجم الملف يجب أن يكون أقل من 5 ميجابايت",
+      "mainSection": "القسم الرئيسي",
+      "mainSectionFood": "طعام",
+      "mainSectionDrinks": "مشروبات",
       "save": "حفظ التصنيف",
       "update": "تحديث التصنيف"
     },
@@ -194,6 +200,9 @@
       "name": "الاسم",
       "order": "الترتيب",
       "status": "الحالة",
+      "mainSection": "القسم الرئيسي",
+      "mainSectionFood": "طعام",
+      "mainSectionDrinks": "مشروبات",
       "created": "تاريخ الإنشاء",
       "actions": "الإجراءات"
     },
@@ -203,6 +212,11 @@
       "emptyDescription": "ابدأ بإنشاء أول تصنيف لك.",
       "errorTitle": "فشل تحميل التصنيفات",
       "errorFallback": "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى."
+    },
+    "filter": {
+      "all": "الكل",
+      "food": "طعام",
+      "drinks": "مشروبات"
     },
     "search": {
       "placeholder": "بحث بالاسم أو الاسم العربي...",

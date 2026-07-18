@@ -16,6 +16,7 @@ function categoryToDomain(row: CategoryRow): LandingCategory {
     descriptionAr: row.name_ar,
     image: resolveImageUrl("category-images", row.image_path),
     icon: "",
+    mainSection: row.main_section as "food" | "drinks",
   };
 }
 

@@ -4,6 +4,7 @@ import type { PaginatedResponse, PaginationParams } from "@/core/types";
 export interface CategoryFilters extends PaginationParams {
   search?: string;
   isActive?: boolean;
+  mainSection?: "food" | "drinks";
 }
 
 export interface CreateCategoryDto {
@@ -13,6 +14,7 @@ export interface CreateCategoryDto {
   image?: string;
   displayOrder: number;
   isActive: boolean;
+  mainSection: "food" | "drinks";
 }
 
 export interface UpdateCategoryDto extends Partial<CreateCategoryDto> {}

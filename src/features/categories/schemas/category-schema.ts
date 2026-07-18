@@ -10,6 +10,7 @@ export const categorySchema = z.object({
     .int({ message: "Must be a whole number" })
     .min(1, { message: "Display order must be at least 1" }),
   isActive: z.boolean(),
+  mainSection: z.enum(["food", "drinks"]),
 });
 
 export type CategoryFormData = z.infer<typeof categorySchema>;

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePublicCategories } from "../hooks/use-public-categories";
 import { usePublicMenuItems } from "../hooks/use-public-menu-items";
-import type { PublicMenuItem } from "../types";
+import type { PublicMenuItem, LandingCategory } from "../types";
 import { ItemDetailsModal } from "./item-details-modal";
 import { cn } from "@core/lib/utils";
 import { useTranslation } from "react-i18next";
@@ -31,6 +31,201 @@ function MenuSkeleton() {
   );
 }
 
+function ItemsGrid({
+  items,
+  onSelect,
+}: {
+  items: PublicMenuItem[];
+  onSelect: (item: PublicMenuItem) => void;
+}) {
+  if (items.length === 0) {
+    return (
+      <div className="col-span-full py-12 text-center">
+        <p className="text-text-secondary text-sm font-medium">
+          No items in this category yet
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3">
+      {items.map((item, index) => (
+        <motion.div
+          key={item.id}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.04, duration: 0.3 }}
+          whileHover={{ y: -4 }}
+          className="group border-border bg-surface cursor-pointer overflow-hidden rounded-xl border shadow-sm transition-shadow hover:shadow-md"
+          onClick={() => onSelect(item)}
+        >
+          <div className="from-primary-100 to-primary-200 dark:from-primary-950/30 dark:to-primary-900/20 relative aspect-[3/2] overflow-hidden bg-gradient-to-br">
+            {item.image ? (
+              <Image
+                src={item.image}
+                alt={item.name}
+                fill
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                unoptimized
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center">
+                <span className="text-primary-300/30 dark:text-primary-700/30 text-5xl font-bold">
+                  {item.name.charAt(0)}
+                </span>
+              </div>
+            )}
+          </div>
+          <div className="p-3 sm:p-4">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <h3 className="text-text-primary rtl:font-arabic truncate font-semibold">
+                  {item.nameAr || item.name}
+                </h3>
+                {item.nameAr && (
+                  <p className="text-text-tertiary truncate text-xs">
+                    {item.name}
+                  </p>
+                )}
+              </div>
+              <span className="bg-primary-50 text-primary-600 dark:bg-primary-950/30 dark:text-primary-400 shrink-0 rounded-lg px-2 py-0.5 text-xs font-semibold sm:px-2.5 sm:text-sm">
+                {item.price}
+              </span>
+            </div>
+            {item.description && (
+              <p className="text-text-tertiary mt-2 line-clamp-2 text-sm leading-relaxed">
+                {item.description}
+              </p>
+            )}
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
+function CategoryPills({
+  categories,
+  activeId,
+  onChange,
+}: {
+  categories: LandingCategory[];
+  activeId: string | null;
+  onChange: (id: string) => void;
+}) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const activeTabRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (activeTabRef.current) {
+      activeTabRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center",
+      });
+    }
+  }, [activeId]);
+
+  return (
+    <div
+      ref={scrollRef}
+      className="scrollbar-hide mt-6 flex gap-3 overflow-x-auto px-1 pb-2 rtl:space-x-reverse"
+    >
+      {categories.map((cat) => (
+        <button
+          key={cat.id}
+          ref={cat.id === activeId ? activeTabRef : undefined}
+          type="button"
+          onClick={() => onChange(cat.id)}
+          className={cn(
+            "relative flex shrink-0 items-center gap-3 rounded-xl border px-5 py-3 text-left transition-all",
+            activeId === cat.id
+              ? "border-primary-500 bg-primary-500/10 shadow-sm"
+              : "border-border bg-surface hover:border-primary-200 hover:bg-primary-50 dark:hover:border-primary-800 dark:hover:bg-primary-950/20",
+          )}
+        >
+          {cat.image ? (
+            <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg">
+              <Image
+                src={cat.image}
+                alt={cat.name}
+                fill
+                className="object-cover"
+                sizes="40px"
+                unoptimized
+              />
+            </div>
+          ) : (
+            <div className="from-primary-100 to-primary-200 dark:from-primary-900/30 dark:to-primary-800/20 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br text-base">
+              {cat.name.charAt(0)}
+            </div>
+          )}
+          <div className="min-w-0">
+            <div className="text-text-primary rtl:font-arabic text-sm font-semibold whitespace-nowrap">
+              {cat.nameAr || cat.name}
+            </div>
+          </div>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function SubSection({
+  heading,
+  categories,
+  activeCat,
+  onActiveChange,
+  items,
+  onSelectItem,
+}: {
+  heading: string;
+  categories: LandingCategory[];
+  activeCat: string | null;
+  onActiveChange: (id: string) => void;
+  items: PublicMenuItem[];
+  onSelectItem: (item: PublicMenuItem) => void;
+}) {
+  const resolvedActive = activeCat ?? categories[0]?.id ?? null;
+  const filteredItems = items.filter((i) => i.categoryId === resolvedActive);
+
+  if (categories.length === 0) return null;
+
+  return (
+    <div className="mt-14">
+      <motion.h3
+        initial={{ opacity: 0, y: 10 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="text-text-primary text-2xl font-bold tracking-tight"
+      >
+        {heading}
+      </motion.h3>
+
+      <CategoryPills
+        categories={categories}
+        activeId={resolvedActive}
+        onChange={onActiveChange}
+      />
+
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={resolvedActive}
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -16 }}
+          transition={{ duration: 0.25, ease: "easeInOut" }}
+          className="mt-6"
+        >
+          <ItemsGrid items={filteredItems} onSelect={onSelectItem} />
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
+}
+
 export function MenuSection() {
   const { t } = useTranslation();
   const {
@@ -45,31 +240,22 @@ export function MenuSection() {
     refetch,
   } = usePublicMenuItems();
 
-  const sortedCategories = categories?.slice().sort((a, b) => {
-    const aIsOffers = a.name === "Offers" || a.nameAr === "عروض";
-    const bIsOffers = b.name === "Offers" || b.nameAr === "عروض";
-    if (aIsOffers && !bIsOffers) return -1;
-    if (!aIsOffers && bIsOffers) return 1;
-    return 0;
-  });
+  const offersCat = categories?.find(
+    (c) => c.name === "Offers" || c.nameAr === "عروض",
+  );
+  const foodCats = categories?.filter(
+    (c) =>
+      c.mainSection === "food" && !(c.name === "Offers" || c.nameAr === "عروض"),
+  );
+  const drinksCats = categories?.filter(
+    (c) =>
+      c.mainSection === "drinks" &&
+      !(c.name === "Offers" || c.nameAr === "عروض"),
+  );
 
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [activeFoodCat, setActiveFoodCat] = useState<string | null>(null);
+  const [activeDrinksCat, setActiveDrinksCat] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<PublicMenuItem | null>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const activeTabRef = useRef<HTMLButtonElement>(null);
-
-  const activeId = activeCategory ?? sortedCategories?.[0]?.id ?? null;
-  const filteredItems = items?.filter((i) => i.categoryId === activeId) ?? [];
-
-  useEffect(() => {
-    if (activeTabRef.current) {
-      activeTabRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-        inline: "center",
-      });
-    }
-  }, [activeId]);
 
   const isLoading = catLoading || itemsLoading;
   const isError = catError || itemsError;
@@ -94,55 +280,6 @@ export function MenuSection() {
           </p>
         </motion.div>
 
-        {sortedCategories && sortedCategories.length > 0 && (
-          <div
-            ref={scrollRef}
-            className="scrollbar-hide mt-10 flex gap-4 overflow-x-auto px-1 pb-2 rtl:space-x-reverse"
-          >
-            {sortedCategories.map((cat) => (
-              <button
-                key={cat.id}
-                ref={cat.id === activeId ? activeTabRef : undefined}
-                type="button"
-                onClick={() => setActiveCategory(cat.id)}
-                className={cn(
-                  "relative flex shrink-0 items-center gap-4 rounded-xl border px-6 py-4 text-left transition-all",
-                  activeId === cat.id
-                    ? "border-primary-500 bg-primary-500/10 shadow-sm"
-                    : "border-border bg-surface hover:border-primary-200 hover:bg-primary-50 dark:hover:border-primary-800 dark:hover:bg-primary-950/20",
-                )}
-              >
-                {cat.image ? (
-                  <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg">
-                    <Image
-                      src={cat.image}
-                      alt={cat.name}
-                      fill
-                      className="object-cover"
-                      sizes="56px"
-                      unoptimized
-                    />
-                  </div>
-                ) : (
-                  <div className="from-primary-100 to-primary-200 dark:from-primary-900/30 dark:to-primary-800/20 flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br text-lg">
-                    {cat.name.charAt(0)}
-                  </div>
-                )}
-                <div className="min-w-0">
-                  <div className="text-text-primary rtl:font-arabic font-semibold">
-                    {cat.nameAr || cat.name}
-                  </div>
-                  {cat.nameAr && (
-                    <div className="text-text-tertiary truncate text-xs">
-                      {cat.name}
-                    </div>
-                  )}
-                </div>
-              </button>
-            ))}
-          </div>
-        )}
-
         {isLoading && <MenuSkeleton />}
 
         {isError && (
@@ -166,82 +303,54 @@ export function MenuSection() {
         )}
 
         {!isLoading && !isError && (
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeId}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -16 }}
-              transition={{ duration: 0.25, ease: "easeInOut" }}
-              className="mt-10 grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3"
-            >
-              {filteredItems.length === 0 && (
-                <div className="col-span-full py-16 text-center">
-                  <div className="bg-surface-tertiary mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full">
-                    <span className="text-text-tertiary text-xl">🍽</span>
-                  </div>
-                  <p className="text-text-secondary text-sm font-medium">
-                    {t("landing.menu.emptyTitle")}
-                  </p>
-                  <p className="text-text-tertiary mt-1 text-xs">
-                    {t("landing.menu.emptyDescription")}
-                  </p>
-                </div>
-              )}
-              {filteredItems.map((item, index) => (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.04, duration: 0.3 }}
-                  whileHover={{ y: -4 }}
-                  className="group border-border bg-surface cursor-pointer overflow-hidden rounded-xl border shadow-sm transition-shadow hover:shadow-md"
-                  onClick={() => setSelectedItem(item)}
+          <>
+            {offersCat && items && (
+              <div className="mt-14">
+                <motion.h3
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="text-text-primary text-2xl font-bold tracking-tight"
                 >
-                  <div className="from-primary-100 to-primary-200 dark:from-primary-950/30 dark:to-primary-900/20 relative aspect-[3/2] overflow-hidden bg-gradient-to-br">
-                    {item.image ? (
-                      <Image
-                        src={item.image}
-                        alt={item.name}
-                        fill
-                        className="object-cover transition-transform duration-300 group-hover:scale-105"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        unoptimized
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center">
-                        <span className="text-primary-300/30 dark:text-primary-700/30 text-5xl font-bold">
-                          {item.name.charAt(0)}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-3 sm:p-4">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0">
-                        <h3 className="text-text-primary rtl:font-arabic truncate font-semibold">
-                          {item.nameAr || item.name}
-                        </h3>
-                        {item.nameAr && (
-                          <p className="text-text-tertiary truncate text-xs">
-                            {item.name}
-                          </p>
-                        )}
-                      </div>
-                      <span className="bg-primary-50 text-primary-600 dark:bg-primary-950/30 dark:text-primary-400 shrink-0 rounded-lg px-2 py-0.5 text-xs font-semibold sm:px-2.5 sm:text-sm">
-                        {item.price}
-                      </span>
-                    </div>
-                    {item.description && (
-                      <p className="text-text-tertiary mt-2 line-clamp-2 text-sm leading-relaxed">
-                        {item.description}
-                      </p>
-                    )}
-                  </div>
+                  {t("landing.menu.offersHeading")}
+                </motion.h3>
+                <motion.div
+                  key={offersCat.id}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25, ease: "easeInOut" }}
+                  className="mt-6"
+                >
+                  <ItemsGrid
+                    items={items.filter((i) => i.categoryId === offersCat.id)}
+                    onSelect={setSelectedItem}
+                  />
                 </motion.div>
-              ))}
-            </motion.div>
-          </AnimatePresence>
+              </div>
+            )}
+
+            {foodCats && foodCats.length > 0 && (
+              <SubSection
+                heading={t("landing.menu.foodHeading")}
+                categories={foodCats}
+                activeCat={activeFoodCat}
+                onActiveChange={setActiveFoodCat}
+                items={items ?? []}
+                onSelectItem={setSelectedItem}
+              />
+            )}
+
+            {drinksCats && drinksCats.length > 0 && (
+              <SubSection
+                heading={t("landing.menu.drinksHeading")}
+                categories={drinksCats}
+                activeCat={activeDrinksCat}
+                onActiveChange={setActiveDrinksCat}
+                items={items ?? []}
+                onSelectItem={setSelectedItem}
+              />
+            )}
+          </>
         )}
       </div>
 

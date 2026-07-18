@@ -21,6 +21,9 @@ import { useTranslation } from "react-i18next";
 export default function CategoriesPage() {
   const router = useRouter();
   const { t } = useTranslation();
+  const [mainSectionFilter, setMainSectionFilter] = useState<
+    "all" | "food" | "drinks"
+  >("all");
 
   const { data, isLoading, isError, error, refetch } = useCategories();
   const deleteMutation = useDeleteCategory();
@@ -64,6 +67,10 @@ export default function CategoriesPage() {
   }, [router]);
 
   const categories = data?.data ?? [];
+  const filtered =
+    mainSectionFilter === "all"
+      ? categories
+      : categories.filter((c) => c.mainSection === mainSectionFilter);
 
   return (
     <div>
@@ -89,10 +96,30 @@ export default function CategoriesPage() {
         <CategoryEmptyState />
       ) : (
         <>
+          <div className="mb-4 flex gap-2">
+            {(["all", "food", "drinks"] as const).map((filter) => (
+              <button
+                key={filter}
+                type="button"
+                onClick={() => setMainSectionFilter(filter)}
+                className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
+                  mainSectionFilter === filter
+                    ? "bg-primary-500 text-white"
+                    : "bg-surface-tertiary text-text-secondary hover:bg-surface-secondary"
+                }`}
+              >
+                {filter === "all"
+                  ? t("categories.filter.all")
+                  : filter === "food"
+                    ? t("categories.filter.food")
+                    : t("categories.filter.drinks")}
+              </button>
+            ))}
+          </div>
           <div className="space-y-4">
             <div className="hidden lg:block">
               <CategoryTable
-                data={categories}
+                data={filtered}
                 isLoading={false}
                 onView={handleView}
                 onEdit={handleEdit}
@@ -101,7 +128,7 @@ export default function CategoriesPage() {
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2 lg:hidden">
-              {categories.map((cat, idx) => (
+              {filtered.map((cat, idx) => (
                 <CategoryCard
                   key={cat.id}
                   category={cat}

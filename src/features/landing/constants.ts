@@ -22,7 +22,7 @@ export const SOCIAL_LINKS = {
   facebook: "https://www.facebook.com/share/1BgYToKRDM/?mibextid=wwXIfr",
 };
 
-export const WHATSAPP_REVIEW_NUMBER = "991660966";
+export const WHATSAPP_REVIEW_NUMBER = "963991660966";
 
 export const LANDING_QUERY_KEYS = {
   categories: ["landing", "categories"],

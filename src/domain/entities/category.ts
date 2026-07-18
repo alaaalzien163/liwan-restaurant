@@ -6,6 +6,7 @@ export interface CategoryEntity {
   image: string;
   displayOrder: number;
   isActive: boolean;
+  mainSection: "food" | "drinks";
   createdAt: string;
   updatedAt: string;
 }
