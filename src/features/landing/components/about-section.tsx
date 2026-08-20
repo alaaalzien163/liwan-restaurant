@@ -53,6 +53,12 @@ export function AboutSection() {
               {t("landing.about.paragraph2")}
             </p>
 
+            <div className="border-primary-500/30 bg-primary-500/5 mt-6 rounded-xl border px-5 py-4">
+              <p className="text-text-secondary rtl:font-arabic text-sm leading-relaxed font-medium whitespace-pre-line">
+                {t("landing.about.ratingInfo")}
+              </p>
+            </div>
+
             <div className="mt-8 grid gap-4 sm:grid-cols-3">
               {highlights.map((item) => (
                 <div
