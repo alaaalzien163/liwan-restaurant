@@ -11,7 +11,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { ImageUpload } from "@/components/ui/image-upload";
-import { uploadFile } from "@/infrastructure/supabase/upload";
 import { motion } from "framer-motion";
 import { Save, X } from "lucide-react";
 import type { CategoryEntity } from "@/domain/entities/category";
@@ -20,7 +19,7 @@ import { useTranslation } from "react-i18next";
 
 interface CategoryFormProps {
   initialData?: CategoryEntity;
-  onSubmit: (data: CategoryFormData) => void;
+  onSubmit: (data: CategoryFormData & { imageFile?: File | null }) => void;
   onCancel: () => void;
   isLoading?: boolean;
 }
@@ -62,26 +61,14 @@ export function CategoryForm({
 
   const imageValue = watch("image");
   const isActiveValue = watch("isActive");
-  const [isImageUploading, setIsImageUploading] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const handleImageChange = useCallback(
     (url: string) => {
-      console.log("[CategoryForm] handleImageChange setValue image:", url);
       setValue("image", url, { shouldValidate: true });
     },
     [setValue],
   );
-
-  const handleImageUpload = useCallback(async (file: File) => {
-    console.log(
-      "[CategoryForm] handleImageUpload called, file:",
-      file.name,
-      file.size,
-    );
-    const result = await uploadFile("category-images", file);
-    console.log("[CategoryForm] uploadFile returned:", result);
-    return result;
-  }, []);
 
   const handleToggleActive = useCallback(() => {
     setValue("isActive", !isActiveValue);
@@ -90,9 +77,9 @@ export function CategoryForm({
 
   const onFormSubmit = useCallback(
     (data: CategoryFormData) => {
-      onSubmit(data);
+      onSubmit({ ...data, imageFile });
     },
-    [onSubmit],
+    [onSubmit, imageFile],
   );
 
   return (
@@ -183,20 +170,15 @@ export function CategoryForm({
       <ImageUpload
         value={imageValue}
         onChange={handleImageChange}
-        onUpload={handleImageUpload}
-        onUploadingChange={setIsImageUploading}
+        onFileChange={setImageFile}
       />
 
       <div className="border-border flex items-center justify-end gap-3 border-t pt-6">
-        <Button
-          variant="secondary"
-          onClick={onCancel}
-          isDisabled={isLoading || isImageUploading}
-        >
+        <Button variant="secondary" onClick={onCancel} isDisabled={isLoading}>
           <X className="h-4 w-4" />
           {t("common.cancel")}
         </Button>
-        <Button type="submit" isLoading={isLoading || isImageUploading}>
+        <Button type="submit" isLoading={isLoading}>
           <Save className="h-4 w-4" />
           {initialData
             ? t("categories.form.update")

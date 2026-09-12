@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, use, useEffect } from "react";
 import { toast } from "sonner";
 import type { MenuItemFormData } from "@/features/menu-items/schemas/menu-item-schema";
+import type { UpdateMenuItemDto } from "@/domain/repositories/menu-repository";
 import { useTranslation } from "react-i18next";
 
 export default function EditMenuItemPage({
@@ -33,29 +34,31 @@ export default function EditMenuItemPage({
   }, [item, t]);
 
   const handleSubmit = useCallback(
-    async (formData: MenuItemFormData) => {
+    async (formData: MenuItemFormData & { imageFile?: File | null }) => {
       try {
-        await updateMutation.mutateAsync({
-          id,
-          data: {
-            ...formData,
-            imageUrl: formData.image,
-            discountPrice:
-              formData.discountPrice &&
-              formData.discountPrice !== ("" as unknown)
-                ? Number(formData.discountPrice)
-                : undefined,
-            price: Number(formData.price),
-            displayOrder: Number(formData.displayOrder),
-          },
-        });
+        const { image, imageFile, ...rest } = formData;
+        const dto: UpdateMenuItemDto = {
+          ...rest,
+          discountPrice:
+            formData.discountPrice && formData.discountPrice !== ("" as unknown)
+              ? Number(formData.discountPrice)
+              : undefined,
+          price: Number(formData.price),
+          displayOrder: Number(formData.displayOrder),
+        };
+        if (imageFile) {
+          dto.imageFile = imageFile;
+        } else if (!image && item?.image) {
+          dto.imageUrl = "";
+        }
+        await updateMutation.mutateAsync({ id, data: dto });
         toast.success(t("menuItems.toast.updated"));
         router.push("/dashboard/menu-items");
       } catch {
         toast.error(t("menuItems.toast.updateFailed"));
       }
     },
-    [updateMutation, id, router, t],
+    [updateMutation, id, router, t, item],
   );
 
   const handleCancel = useCallback(() => {

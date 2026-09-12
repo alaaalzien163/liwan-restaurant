@@ -11,7 +11,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { ImageUpload } from "@/components/ui/image-upload";
-import { uploadFile } from "@/infrastructure/supabase/upload";
 import { motion } from "framer-motion";
 import { Save, X } from "lucide-react";
 import type { MenuItemRecord } from "../types";
@@ -21,7 +20,7 @@ import { useCategories } from "@/features/categories/hooks";
 
 interface MenuItemFormProps {
   initialData?: MenuItemRecord;
-  onSubmit: (data: MenuItemFormData) => void;
+  onSubmit: (data: MenuItemFormData & { imageFile?: File | null }) => void;
   onCancel: () => void;
   isLoading?: boolean;
 }
@@ -85,32 +84,20 @@ export function MenuItemForm({
   const imageValue = watch("image");
   const isAvailableValue = watch("isAvailable");
   const isFeaturedValue = watch("isFeatured");
-  const [isImageUploading, setIsImageUploading] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const handleImageChange = useCallback(
     (url: string) => {
-      console.log("[MenuItemForm] handleImageChange setValue image:", url);
       setValue("image", url, { shouldValidate: true });
     },
     [setValue],
   );
 
-  const handleImageUpload = useCallback(async (file: File) => {
-    console.log(
-      "[MenuItemForm] handleImageUpload called, file:",
-      file.name,
-      file.size,
-    );
-    const result = await uploadFile("menu-images", file);
-    console.log("[MenuItemForm] uploadFile returned:", result);
-    return result;
-  }, []);
-
   const onFormSubmit = useCallback(
     (data: MenuItemFormData) => {
-      onSubmit(data);
+      onSubmit({ ...data, imageFile });
     },
-    [onSubmit],
+    [onSubmit, imageFile],
   );
 
   return (
@@ -252,20 +239,15 @@ export function MenuItemForm({
       <ImageUpload
         value={imageValue}
         onChange={handleImageChange}
-        onUpload={handleImageUpload}
-        onUploadingChange={setIsImageUploading}
+        onFileChange={setImageFile}
       />
 
       <div className="border-border flex items-center justify-end gap-3 border-t pt-6">
-        <Button
-          variant="secondary"
-          onClick={onCancel}
-          isDisabled={isLoading || isImageUploading}
-        >
+        <Button variant="secondary" onClick={onCancel} isDisabled={isLoading}>
           <X className="h-4 w-4" />
           {t("menuItems.form.cancel")}
         </Button>
-        <Button type="submit" isLoading={isLoading || isImageUploading}>
+        <Button type="submit" isLoading={isLoading}>
           <Save className="h-4 w-4" />
           {initialData ? t("menuItems.form.update") : t("menuItems.form.save")}
         </Button>

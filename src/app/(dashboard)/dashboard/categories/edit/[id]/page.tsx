@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, use, useEffect } from "react";
 import { toast } from "sonner";
 import type { CategoryFormData } from "@/features/categories/schemas/category-schema";
+import type { UpdateCategoryDto } from "@/domain/repositories/category-repository";
 import { useTranslation } from "react-i18next";
 
 export default function EditCategoryPage({
@@ -39,16 +40,23 @@ export default function EditCategoryPage({
   }, [category, t]);
 
   const handleSubmit = useCallback(
-    async (formData: CategoryFormData) => {
+    async (formData: CategoryFormData & { imageFile?: File | null }) => {
       try {
-        await updateMutation.mutateAsync({ id, data: formData });
+        const { image, imageFile, ...rest } = formData;
+        const dto: UpdateCategoryDto = { ...rest };
+        if (imageFile) {
+          dto.imageFile = imageFile;
+        } else if (!image && category?.image) {
+          dto.image = "";
+        }
+        await updateMutation.mutateAsync({ id, data: dto });
         toast.success(t("categories.toast.updated"));
         router.push("/dashboard/categories");
       } catch {
         toast.error(t("categories.toast.updateFailed"));
       }
     },
-    [updateMutation, id, router, t],
+    [updateMutation, id, router, t, category],
   );
 
   const handleCancel = useCallback(() => {

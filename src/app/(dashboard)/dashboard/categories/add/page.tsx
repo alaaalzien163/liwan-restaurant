@@ -16,9 +16,13 @@ export default function AddCategoryPage() {
   const createMutation = useCreateCategory();
 
   const handleSubmit = useCallback(
-    async (data: CategoryFormData) => {
+    async (data: CategoryFormData & { imageFile?: File | null }) => {
       try {
-        await createMutation.mutateAsync(data);
+        await createMutation.mutateAsync({
+          ...data,
+          image: data.image || undefined,
+          imageFile: data.imageFile ?? undefined,
+        });
         toast.success(t("categories.toast.created"));
         router.push("/dashboard/categories");
       } catch {

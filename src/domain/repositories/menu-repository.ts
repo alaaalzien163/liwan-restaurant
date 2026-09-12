@@ -26,6 +26,7 @@ export interface CreateMenuItemDto {
   categoryId: string;
   imageUrl?: string;
   image?: string;
+  imageFile?: File | null;
   discountPrice?: number;
   displayOrder?: number;
   images?: string[];

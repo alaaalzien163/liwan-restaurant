@@ -12,7 +12,12 @@ import type { PaginatedResponse } from "@/core/types";
 import { getSupabaseClient, getCurrentUserId } from "../client";
 import type { CategoryRow, MenuItemRow } from "../database.types";
 import { resolveImageUrl } from "../storage";
-import { deleteStorageFile, isBlobUrl } from "../upload";
+import {
+  deleteStorageFile,
+  extractStoragePath,
+  isBlobUrl,
+  uploadEntityImage,
+} from "../upload";
 import { logFetchResult, logQueryError } from "../debug";
 
 const IMAGE_BUCKET = "menu-images";
@@ -171,7 +176,7 @@ export class SupabaseMenuRepository implements IMenuRepository {
         name_en: dto.name,
         name_ar: dto.nameAr || dto.name,
         description: dto.description,
-        image_path: image,
+        image_path: dto.imageFile ? null : image,
         price: dto.price,
         is_available: dto.isAvailable ?? true,
         display_order: dto.displayOrder ?? 0,
@@ -181,6 +186,33 @@ export class SupabaseMenuRepository implements IMenuRepository {
 
     if (error) throw new Error(`Failed to create menu item: ${error.message}`);
     const row = data as unknown as MenuItemRow;
+
+    if (dto.imageFile) {
+      const storagePath = await uploadEntityImage(
+        IMAGE_BUCKET,
+        row.id,
+        dto.imageFile,
+      );
+
+      const { data: updated, error: imageError } = await supabase
+        .from("menu_items")
+        .update({ image_path: storagePath })
+        .eq("id", row.id)
+        .select()
+        .single();
+
+      if (imageError) {
+        throw new Error(
+          `Failed to save menu item image: ${imageError.message}`,
+        );
+      }
+      const updatedRow = updated as unknown as MenuItemRow;
+      const category = await this.getCategoryById(updatedRow.category_id).catch(
+        () => undefined,
+      );
+      return itemToDomain(updatedRow, category);
+    }
+
     const category = await this.getCategoryById(row.category_id).catch(
       () => undefined,
     );
@@ -199,18 +231,35 @@ export class SupabaseMenuRepository implements IMenuRepository {
       throw new Error("Cannot persist blob URL as image");
     }
 
-    if (dto.imageUrl !== undefined) {
-      const { data: current } = await supabase
-        .from("menu_items")
-        .select("image_path")
-        .eq("id", id)
-        .single();
+    const { data: current } = await supabase
+      .from("menu_items")
+      .select("image_path")
+      .eq("id", id)
+      .single();
 
-      const oldPath = (current as { image_path: string | null } | undefined)
-        ?.image_path;
+    const oldPath =
+      (current as { image_path: string | null } | undefined)?.image_path ??
+      null;
 
-      if (oldPath && oldPath !== newImage) {
-        await deleteStorageFile(oldPath, IMAGE_BUCKET).catch(() => {});
+    let newStoragePath: string | null | undefined = undefined;
+    let oldToDelete: string | null = null;
+
+    if (dto.imageFile) {
+      // Upload the new file FIRST (ID-based path) and confirm success.
+      const storagePath = await uploadEntityImage(
+        IMAGE_BUCKET,
+        id,
+        dto.imageFile,
+      );
+      newStoragePath = storagePath;
+      if (oldPath && extractStoragePath(oldPath) !== storagePath) {
+        oldToDelete = oldPath;
+      }
+    } else if (dto.imageUrl !== undefined) {
+      const image = dto.imageUrl || null;
+      newStoragePath = image;
+      if (oldPath && extractStoragePath(oldPath) !== (image ?? "")) {
+        oldToDelete = oldPath;
       }
     }
 
@@ -220,7 +269,7 @@ export class SupabaseMenuRepository implements IMenuRepository {
     if (dto.name !== undefined) updates.name_en = dto.name;
     if (dto.nameAr !== undefined) updates.name_ar = dto.nameAr;
     if (dto.description !== undefined) updates.description = dto.description;
-    if (dto.imageUrl !== undefined) updates.image_path = newImage;
+    if (newStoragePath !== undefined) updates.image_path = newStoragePath;
     if (dto.price !== undefined) updates.price = dto.price;
     if (dto.categoryId !== undefined) updates.category_id = dto.categoryId;
 
@@ -232,6 +281,14 @@ export class SupabaseMenuRepository implements IMenuRepository {
       .single();
 
     if (error) throw new Error(`Failed to update menu item: ${error.message}`);
+
+    // Delete the old object only AFTER the update succeeded (oldToDelete is
+    // only set when the uploaded/persisted path actually differs) and only when
+    // it belongs to the current project's bucket.
+    if (oldToDelete) {
+      await deleteStorageFile(oldToDelete, IMAGE_BUCKET).catch(() => {});
+    }
+
     const row = data as unknown as MenuItemRow;
     const category = await this.getCategoryById(row.category_id).catch(
       () => undefined,

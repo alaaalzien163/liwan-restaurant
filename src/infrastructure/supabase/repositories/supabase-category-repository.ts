@@ -9,7 +9,13 @@ import type { PaginatedResponse } from "@/core/types";
 import { getSupabaseClient, getCurrentUserId } from "../client";
 import type { CategoryRow } from "../database.types";
 import { resolveImageUrl } from "../storage";
-import { deleteStorageFile, isBlobUrl } from "../upload";
+import {
+  assertNotBlobUrl,
+  deleteStorageFile,
+  extractStoragePath,
+  isBlobUrl,
+  uploadEntityImage,
+} from "../upload";
 import { logFetchResult, logQueryError } from "../debug";
 
 const IMAGE_BUCKET = "category-images";
@@ -90,14 +96,12 @@ export class SupabaseCategoryRepository implements ICategoryRepository {
 
   async createCategory(dto: CreateCategoryDto): Promise<CategoryEntity> {
     const supabase = getSupabaseClient();
-    const image = dto.image || null;
-    if (image && isBlobUrl(image)) {
-      throw new Error("Cannot persist blob URL as image");
-    }
+    if (dto.image !== undefined) assertNotBlobUrl(dto.image, "category image");
     const userId = await getCurrentUserId();
     if (!userId) {
       throw new Error("You must be signed in to create a category");
     }
+
     const { data, error } = await supabase
       .from("categories")
       .insert({
@@ -105,7 +109,7 @@ export class SupabaseCategoryRepository implements ICategoryRepository {
         name_en: dto.name,
         name_ar: dto.nameAr,
         description: dto.description ?? "",
-        image_path: image,
+        image_path: dto.imageFile ? null : dto.image || null,
         display_order: dto.displayOrder ?? 0,
         is_active: dto.isActive ?? true,
         main_section: dto.mainSection,
@@ -114,7 +118,30 @@ export class SupabaseCategoryRepository implements ICategoryRepository {
       .single();
 
     if (error) throw new Error(`Failed to create category: ${error.message}`);
-    return toDomain(data as unknown as CategoryRow);
+
+    const row = data as unknown as CategoryRow;
+
+    if (dto.imageFile) {
+      const storagePath = await uploadEntityImage(
+        IMAGE_BUCKET,
+        row.id,
+        dto.imageFile,
+      );
+
+      const { data: updated, error: imageError } = await supabase
+        .from("categories")
+        .update({ image_path: storagePath })
+        .eq("id", row.id)
+        .select()
+        .single();
+
+      if (imageError) {
+        throw new Error(`Failed to save category image: ${imageError.message}`);
+      }
+      return toDomain(updated as unknown as CategoryRow);
+    }
+
+    return toDomain(row);
   }
 
   async updateCategory(
@@ -128,18 +155,35 @@ export class SupabaseCategoryRepository implements ICategoryRepository {
       throw new Error("Cannot persist blob URL as image");
     }
 
-    if (dto.image !== undefined) {
-      const { data: current } = await supabase
-        .from("categories")
-        .select("image_path")
-        .eq("id", id)
-        .single();
+    const { data: current } = await supabase
+      .from("categories")
+      .select("image_path")
+      .eq("id", id)
+      .single();
 
-      const oldPath = (current as { image_path: string | null } | undefined)
-        ?.image_path;
+    const oldPath =
+      (current as { image_path: string | null } | undefined)?.image_path ??
+      null;
 
-      if (oldPath && oldPath !== newImage) {
-        await deleteStorageFile(oldPath, IMAGE_BUCKET).catch(() => {});
+    let newStoragePath: string | null | undefined = undefined;
+    let oldToDelete: string | null = null;
+
+    if (dto.imageFile) {
+      // Upload the new file FIRST (ID-based path) and confirm success.
+      const storagePath = await uploadEntityImage(
+        IMAGE_BUCKET,
+        id,
+        dto.imageFile,
+      );
+      newStoragePath = storagePath;
+      if (oldPath && extractStoragePath(oldPath) !== storagePath) {
+        oldToDelete = oldPath;
+      }
+    } else if (dto.image !== undefined) {
+      const image = dto.image || null;
+      newStoragePath = image;
+      if (oldPath && extractStoragePath(oldPath) !== (image ?? "")) {
+        oldToDelete = oldPath;
       }
     }
 
@@ -148,8 +192,8 @@ export class SupabaseCategoryRepository implements ICategoryRepository {
     > = {};
     if (dto.name !== undefined) updates.name_en = dto.name;
     if (dto.nameAr !== undefined) updates.name_ar = dto.nameAr;
-    if (dto.image !== undefined) updates.image_path = newImage;
     if (dto.mainSection !== undefined) updates.main_section = dto.mainSection;
+    if (newStoragePath !== undefined) updates.image_path = newStoragePath;
 
     const { data, error } = await supabase
       .from("categories")
@@ -159,6 +203,14 @@ export class SupabaseCategoryRepository implements ICategoryRepository {
       .single();
 
     if (error) throw new Error(`Failed to update category: ${error.message}`);
+
+    // Delete the old object only AFTER the update succeeded (oldToDelete is
+    // only set when the uploaded/persisted path actually differs) and only when
+    // it belongs to the current project's bucket.
+    if (oldToDelete) {
+      await deleteStorageFile(oldToDelete, IMAGE_BUCKET).catch(() => {});
+    }
+
     return toDomain(data as unknown as CategoryRow);
   }
 

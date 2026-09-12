@@ -11,6 +11,7 @@ interface ImageUploadProps extends BaseProps {
   onChange?: (value: string) => void;
   onUpload?: (file: File) => Promise<string>;
   onUploadingChange?: (uploading: boolean) => void;
+  onFileChange?: (file: File | null) => void;
   error?: string;
   label?: string;
 }
@@ -23,6 +24,7 @@ export function ImageUpload({
   onChange,
   onUpload,
   onUploadingChange,
+  onFileChange,
   error,
   label,
   className,
@@ -51,6 +53,11 @@ export function ImageUpload({
       const blobUrl = URL.createObjectURL(file);
       setPreviewUrl(blobUrl);
 
+      if (onFileChange) {
+        onFileChange(file);
+        return;
+      }
+
       if (onUpload) {
         setIsUploading(true);
         onUploadingChange?.(true);
@@ -77,7 +84,7 @@ export function ImageUpload({
         }
       }
     },
-    [onChange, onUpload, onUploadingChange],
+    [onChange, onUpload, onUploadingChange, onFileChange],
   );
 
   const handleDrop = useCallback(
@@ -120,7 +127,8 @@ export function ImageUpload({
       "[ImageUpload] handleRemove calling onChange with: empty string",
     );
     onChange?.("");
-  }, [previewUrl, onChange]);
+    onFileChange?.(null);
+  }, [previewUrl, onChange, onFileChange]);
 
   const displayUrl = previewUrl || value || "";
   const displayError = error || validationError;

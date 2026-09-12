@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 import { toast } from "sonner";
 import type { MenuItemFormData } from "@/features/menu-items/schemas/menu-item-schema";
+import type { CreateMenuItemDto } from "@/domain/repositories/menu-repository";
 import { useTranslation } from "react-i18next";
 
 export default function AddMenuItemPage() {
@@ -16,18 +17,24 @@ export default function AddMenuItemPage() {
   const createMutation = useCreateMenuItem();
 
   const handleSubmit = useCallback(
-    async (data: MenuItemFormData) => {
+    async (data: MenuItemFormData & { imageFile?: File | null }) => {
       try {
-        await createMutation.mutateAsync({
-          ...data,
-          imageUrl: data.image,
+        const { image, imageFile, ...rest } = data;
+        const dto: CreateMenuItemDto = {
+          ...rest,
           discountPrice:
             data.discountPrice && data.discountPrice !== ("" as unknown)
               ? Number(data.discountPrice)
               : undefined,
           price: Number(data.price),
           displayOrder: Number(data.displayOrder),
-        });
+        };
+        if (imageFile) {
+          dto.imageFile = imageFile;
+        } else if (!image) {
+          dto.imageUrl = "";
+        }
+        await createMutation.mutateAsync(dto);
         toast.success(t("menuItems.toast.created"));
         router.push("/dashboard/menu-items");
       } catch {

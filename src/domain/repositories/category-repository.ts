@@ -12,6 +12,7 @@ export interface CreateCategoryDto {
   nameAr: string;
   description?: string;
   image?: string;
+  imageFile?: File | null;
   displayOrder: number;
   isActive: boolean;
   mainSection: "food" | "drinks";
