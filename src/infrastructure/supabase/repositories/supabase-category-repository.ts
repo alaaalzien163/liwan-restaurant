@@ -6,10 +6,11 @@ import type {
 } from "@/domain/repositories/category-repository";
 import type { CategoryEntity } from "@/domain/entities/category";
 import type { PaginatedResponse } from "@/core/types";
-import { getSupabaseClient } from "../client";
+import { getSupabaseClient, getCurrentUserId } from "../client";
 import type { CategoryRow } from "../database.types";
 import { resolveImageUrl } from "../storage";
 import { deleteStorageFile, isBlobUrl } from "../upload";
+import { logFetchResult, logQueryError } from "../debug";
 
 const IMAGE_BUCKET = "category-images";
 
@@ -59,9 +60,13 @@ export class SupabaseCategoryRepository implements ICategoryRepository {
 
     const { data, error, count } = await query.range(start, end);
 
-    if (error) throw new Error(`Failed to fetch categories: ${error.message}`);
+    if (error) {
+      logQueryError("SupabaseCategoryRepository", "categories", error);
+      throw new Error(`Failed to fetch categories: ${error.message}`);
+    }
 
     const rows = (data ?? []) as unknown as CategoryRow[];
+    logFetchResult("SupabaseCategoryRepository", "categories", count);
     return {
       data: rows.map(toDomain),
       total: count ?? 0,
@@ -89,14 +94,22 @@ export class SupabaseCategoryRepository implements ICategoryRepository {
     if (image && isBlobUrl(image)) {
       throw new Error("Cannot persist blob URL as image");
     }
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      throw new Error("You must be signed in to create a category");
+    }
     const { data, error } = await supabase
       .from("categories")
       .insert({
+        user_id: userId,
         name_en: dto.name,
         name_ar: dto.nameAr,
+        description: dto.description ?? "",
         image_path: image,
+        display_order: dto.displayOrder ?? 0,
+        is_active: dto.isActive ?? true,
         main_section: dto.mainSection,
-      } satisfies Omit<CategoryRow, "id" | "created_at">)
+      } satisfies Omit<CategoryRow, "id" | "created_at" | "updated_at">)
       .select()
       .single();
 
@@ -130,7 +143,9 @@ export class SupabaseCategoryRepository implements ICategoryRepository {
       }
     }
 
-    const updates: Partial<Omit<CategoryRow, "id" | "created_at">> = {};
+    const updates: Partial<
+      Omit<CategoryRow, "id" | "created_at" | "updated_at">
+    > = {};
     if (dto.name !== undefined) updates.name_en = dto.name;
     if (dto.nameAr !== undefined) updates.name_ar = dto.nameAr;
     if (dto.image !== undefined) updates.image_path = newImage;

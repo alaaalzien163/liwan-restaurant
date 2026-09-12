@@ -63,8 +63,13 @@ export const useAuthStore = create<AuthStore>()(
       checkAuth: async () => {
         try {
           const user = await getAuthRepo().getCurrentUser();
+          console.log("[auth] checkAuth: authenticated as", user.email);
           set({ user, isAuthenticated: true, isLoading: false });
-        } catch {
+        } catch (err) {
+          console.warn(
+            "[auth] checkAuth: not authenticated:",
+            err instanceof Error ? err.message : err,
+          );
           set({ user: null, isAuthenticated: false, isLoading: false });
         }
       },

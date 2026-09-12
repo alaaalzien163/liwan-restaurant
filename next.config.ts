@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "pxbvwdmwypfzraazvuph.supabase.co",
+        hostname: "tjbdmrzcyzwmtvodgspt.supabase.co",
         pathname: "/storage/v1/object/public/**",
       },
     ],
@@ -21,7 +21,9 @@ const nextConfig: NextConfig = {
 
   // Compiler options
   compiler: {
-    removeConsole: process.env.NODE_ENV === "production",
+    removeConsole: {
+      exclude: ["error"],
+    },
   },
 };
 

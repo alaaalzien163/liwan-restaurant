@@ -8,7 +8,7 @@ const envSchema = z.object({
   NEXT_PUBLIC_API_URL: z.string().url().default("http://localhost:8080/api"),
   API_TIMEOUT: z.coerce.number().default(30000),
   NEXT_PUBLIC_SUPABASE_URL: z.string().url().default(""),
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().default(""),
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z.string().default(""),
 });
 
 function validateEnv() {

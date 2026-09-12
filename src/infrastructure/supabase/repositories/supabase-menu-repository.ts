@@ -9,10 +9,11 @@ import type {
   MenuCategoryEntity,
 } from "@/domain/entities/menu-item";
 import type { PaginatedResponse } from "@/core/types";
-import { getSupabaseClient } from "../client";
+import { getSupabaseClient, getCurrentUserId } from "../client";
 import type { CategoryRow, MenuItemRow } from "../database.types";
 import { resolveImageUrl } from "../storage";
 import { deleteStorageFile, isBlobUrl } from "../upload";
+import { logFetchResult, logQueryError } from "../debug";
 
 const IMAGE_BUCKET = "menu-images";
 
@@ -108,9 +109,13 @@ export class SupabaseMenuRepository implements IMenuRepository {
 
     const { data, error, count } = await query.range(start, end);
 
-    if (error) throw new Error(`Failed to fetch menu items: ${error.message}`);
+    if (error) {
+      logQueryError("SupabaseMenuRepository", "menu_items", error);
+      throw new Error(`Failed to fetch menu items: ${error.message}`);
+    }
 
     const rows = (data ?? []) as unknown as MenuItemRow[];
+    logFetchResult("SupabaseMenuRepository", "menu_items", count);
     return {
       data: rows.map((row) => itemToDomain(row)),
       total: count ?? 0,
@@ -154,16 +159,23 @@ export class SupabaseMenuRepository implements IMenuRepository {
     if (image && isBlobUrl(image)) {
       throw new Error("Cannot persist blob URL as image");
     }
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      throw new Error("You must be signed in to create a menu item");
+    }
     const { data, error } = await supabase
       .from("menu_items")
       .insert({
+        user_id: userId,
         category_id: dto.categoryId,
         name_en: dto.name,
         name_ar: dto.nameAr || dto.name,
         description: dto.description,
         image_path: image,
         price: dto.price,
-      } satisfies Omit<MenuItemRow, "id" | "created_at">)
+        is_available: dto.isAvailable ?? true,
+        display_order: dto.displayOrder ?? 0,
+      } satisfies Omit<MenuItemRow, "id" | "created_at" | "updated_at">)
       .select()
       .single();
 
@@ -202,7 +214,9 @@ export class SupabaseMenuRepository implements IMenuRepository {
       }
     }
 
-    const updates: Partial<Omit<MenuItemRow, "id" | "created_at">> = {};
+    const updates: Partial<
+      Omit<MenuItemRow, "id" | "created_at" | "updated_at">
+    > = {};
     if (dto.name !== undefined) updates.name_en = dto.name;
     if (dto.nameAr !== undefined) updates.name_ar = dto.nameAr;
     if (dto.description !== undefined) updates.description = dto.description;
@@ -268,14 +282,22 @@ export class SupabaseMenuRepository implements IMenuRepository {
     dto: Omit<MenuCategoryEntity, "id" | "createdAt" | "updatedAt">,
   ): Promise<MenuCategoryEntity> {
     const supabase = getSupabaseClient();
+    const userId = await getCurrentUserId();
+    if (!userId) {
+      throw new Error("You must be signed in to create a category");
+    }
     const { data, error } = await supabase
       .from("categories")
       .insert({
+        user_id: userId,
         name_en: dto.name,
         name_ar: dto.nameAr,
+        description: "",
         image_path: null,
+        display_order: 0,
+        is_active: true,
         main_section: "food",
-      } satisfies Omit<CategoryRow, "id" | "created_at">)
+      } satisfies Omit<CategoryRow, "id" | "created_at" | "updated_at">)
       .select()
       .single();
 
@@ -288,7 +310,9 @@ export class SupabaseMenuRepository implements IMenuRepository {
     dto: Partial<MenuCategoryEntity>,
   ): Promise<MenuCategoryEntity> {
     const supabase = getSupabaseClient();
-    const updates: Partial<Omit<CategoryRow, "id" | "created_at">> = {};
+    const updates: Partial<
+      Omit<CategoryRow, "id" | "created_at" | "updated_at">
+    > = {};
     if (dto.name !== undefined) updates.name_en = dto.name;
     if (dto.nameAr !== undefined) updates.name_ar = dto.nameAr;
 
